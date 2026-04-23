@@ -388,8 +388,6 @@ function getMemberPaymentStats(mid){
   const p=state.payments[mid]||{};
   let paid=0,total=0,paidAmt=0,dueAmt=0;
   for(let m=1;m<=CONFIG.MONTH_COUNT;m++){
-    const isBorrMonth=getBorrowerIds(m).includes(mid);
-    if(isBorrMonth){total++;paid++;continue}
     total++;
     const e=p[m];
     if(e&&e.paid){paid++;paidAmt+=e.amount||SCHEDULE_DATA[m-1][0]}
@@ -400,32 +398,28 @@ function getMemberPaymentStats(mid){
 function getMonthStats(mo){
   let paid=0,unpaid=0;
   state.members.forEach(m=>{
-    if(getBorrowerIds(mo).includes(m.id)){paid++;return}
     const e=(state.payments[m.id]||{})[mo];
     if(e&&e.paid)paid++;else unpaid++;
   });
   return{paid,unpaid,total:state.members.length}
 }
 function getTotalCollected(){let t=0;state.members.forEach(m=>{const p=state.payments[m.id]||{};Object.entries(p).forEach(([mo,e])=>{if(e.paid)t+=e.amount||SCHEDULE_DATA[parseInt(mo)-1][0]})});return t}
-function getTotalPending(){let t=0;state.members.forEach(m=>{const p=state.payments[m.id]||{};for(let mo=1;mo<=state.currentMonth;mo++){if(getBorrowerIds(mo).includes(m.id))continue;const e=p[mo];if(!e||!e.paid)t+=SCHEDULE_DATA[mo-1][0]}});return t}
+function getTotalPending(){let t=0;state.members.forEach(m=>{const p=state.payments[m.id]||{};for(let mo=1;mo<=state.currentMonth;mo++){const e=p[mo];if(!e||!e.paid)t+=SCHEDULE_DATA[mo-1][0]}});return t}
 
 /** Collected for a single month only. */
 function getMonthCollected(mo){
   let t=0;
   state.members.forEach(m=>{
-    if(getBorrowerIds(mo).includes(m.id))return;
     const e=(state.payments[m.id]||{})[mo];
     if(e&&e.paid)t+=e.amount||SCHEDULE_DATA[mo-1][0];
   });
   return t;
 }
 
-/** Pending for a single month only (only if month is unlocked). */
 function getMonthPending(mo){
   if(mo>state.currentMonth)return 0;
   let t=0;
   state.members.forEach(m=>{
-    if(getBorrowerIds(mo).includes(m.id))return;
     const e=(state.payments[m.id]||{})[mo];
     if(!e||!e.paid)t+=SCHEDULE_DATA[mo-1][0];
   });
@@ -651,7 +645,7 @@ function renderPaymentSummary(){
       return`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px 12px"><div style="display:flex;align-items:center;gap:8px"><div class="member-avatar" style="width:26px;height:26px;font-size:10px;background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><span style="font-size:13px">${sanitize(m.name)}</span></div></td>
         <td style="padding:8px 12px;font-size:12px;color:var(--slate)">Slot #${m.slotNo}</td>
-        <td style="padding:8px 12px">${isBorr?'<span class="badge badge-gold">🏆 Borrower — Exempt</span>':paid?`<span class="badge badge-green">✓ Paid</span>`:'<span class="badge badge-red">Due</span>'}</td>
+        <td style="padding:8px 12px">${isBorr?'<span class="badge badge-gold">🏆 Borrower</span>':paid?`<span class="badge badge-green">✓ Paid</span>`:'<span class="badge badge-red">Due</span>'}</td>
         <td style="padding:8px 12px;font-family:\'JetBrains Mono\',monospace;font-size:12px">${isBorr?'—':fmt(amt)}</td>
         <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${dateStr}</td>
       </tr>`;
@@ -767,21 +761,13 @@ function renderPaymentGrid(mid){
     const isComm=sch&&sch.commission>0;
     const isFut=mo>state.currentMonth;
     const isBorrower=getBorrowerIds(mo).includes(mid);
-    // Borrower month: exempt from payment
-    if(isBorrower&&!isFut){
-      return`<div class="payment-cell commission" style="border-color:#86efac;background:#f0fdf4">
-        <div class="pc-month">Month ${mo} · ${fmtDate(sch?.date)}</div>
-        <div class="pc-amount" style="color:var(--green)">Exempt</div>
-        <div class="pc-status paid">🏆 Borrower Month</div>
-      </div>`;
-    }
     const cls=isFut?'future':(isComm?'commission':(e.paid?'paid':'unpaid'));
     const st=isFut?'🔒 Locked':(isComm?'Commission':(e.paid?'Paid':'Unpaid'));
     const sc=isFut?'future':(e.paid?'paid':'unpaid');
     const ca=isFut?'':`data-action="open-payment" data-member-id="${mid}" data-month="${mo}"`;
     return`<div class="payment-cell ${cls}" role="${isFut?'presentation':'button'}" tabindex="${isFut?-1:0}" ${ca}>
-      <div class="pc-month">Month ${mo} · ${fmtDate(sch?.date)}</div>
-      <div class="pc-amount">${fmt(e.amount||SCHEDULE_DATA[month-1][0])}</div>
+      <div class="pc-month">Month ${mo} · ${fmtDate(sch?.date)}${isBorrower?' 🏆':''}</div>
+      <div class="pc-amount">${fmt(e.amount||SCHEDULE_DATA[mo-1][0])}</div>
       ${e.note?`<div class="pc-status" style="color:var(--gold)">${sanitize(e.note)}</div>`:''}
       <div class="pc-status ${sc}">${st}${e.date?' · '+fmtDate(e.date):''}</div>
     </div>`;
@@ -809,29 +795,17 @@ function renderUserDetail(id){
     const isFut=mo>state.currentMonth;
     const isBorrower=getBorrowerIds(mo).includes(id);
     const fc=SCHEDULE_DATA[mo-1][1];
-    // Borrower month — exempt
-    if(isBorrower&&!isFut){
-      return`<div class="payment-row" style="background:var(--green-bg);border-radius:8px;padding:10px 8px">
-        <div class="pr-sl">${mo}</div>
-        <div class="pr-month">${fmtDate(sch?.date||'')}</div>
-        <div class="pr-amount" style="color:var(--green);font-weight:700">Exempt</div>
-        <div class="pr-note" style="color:var(--green)">🏆 Borrower</div>
-        <div class="pr-cumulative">${fc!=null?fmt(fc):'—'}</div>
-        <div class="pr-date">—</div>
-        <span class="badge badge-green">✓ Exempt</span>
-      </div>`;
-    }
     return`<div class="payment-row" ${isFut?'style="opacity:0.4"':''}>
       <div class="pr-sl">${mo}</div>
       <div class="pr-month">${fmtDate(sch?.date||'')}</div>
       <div class="pr-amount">${isFut?'<span style="color:var(--slate)">Locked</span>':fmt(e.amount||SCHEDULE_DATA[mo-1][0])}</div>
-      ${sch?.commission&&!isFut?`<div class="pr-note">Commission: ${fmt(sch.commission)}</div>`:'<div class="pr-note"></div>'}
+      ${isBorrower&&!isFut?'<div class="pr-note" style="color:var(--gold)">🏆 Borrower</div>':sch?.commission&&!isFut?`<div class="pr-note">Commission: ${fmt(sch.commission)}</div>`:'<div class="pr-note"></div>'}
       <div class="pr-cumulative">${!isFut&&fc!=null?fmt(fc):'—'}</div>
       <div class="pr-date">${isFut?'🔒':e.date?fmtDate(e.date):'<span style="color:var(--red)">Not paid</span>'}</div>
       ${!isFut?`<span class="badge ${e.paid?'badge-green':'badge-red'}">${e.paid?'✓ Paid':'Due'}</span>`:'<span class="badge" style="background:var(--bg);color:var(--slate)">—</span>'}
     </div>`;
   }).join('');
-  document.getElementById('userDetailSection').innerHTML=`<div class="user-detail-card"><div class="udc-banner"><div class="udc-banner-pattern"></div></div><div class="udc-profile"><div class="udc-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div class="udc-info"><div class="udc-name">${sanitize(m.name)}</div><div class="udc-meta">Slot #${m.slotNo} · ${sanitize(m.phone||'—')} · ${sanitize(m.email||'—')}</div></div></div><div class="udc-stats"><div class="udc-stat"><div class="udc-stat-val" style="color:var(--green)">${s.paid}</div><div class="udc-stat-lbl">Months Paid</div></div><div class="udc-stat"><div class="udc-stat-val" style="color:var(--red)">${s.pending}</div><div class="udc-stat-lbl">Pending</div></div><div class="udc-stat"><div class="udc-stat-val">${fmt(s.paidAmount)}</div><div class="udc-stat-lbl">Total Paid</div></div><div class="udc-stat"><div class="udc-stat-val">${pct}%</div><div class="udc-stat-lbl">Completion</div></div></div>${bm.length?`<div style="padding:16px 24px;background:var(--gold-pale);border-top:1px solid var(--border);border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏆 Chit Borrower — No payment required for borrower month</div>${bm.map(b=>`<div style="font-size:13px;color:var(--ink)">Month ${b.month} · <strong>${fmt(b.amount)}</strong> received${b.split?' (split pot)':''} · ${fmtDate(b.date)}</div>`).join('')}</div>`:''}<div class="udc-payments"><div class="udc-payments-title">Payment History</div><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;font-size:11px;color:var(--slate)"><span style="width:30px">Sl</span><span style="width:90px">Date</span><span style="flex:1">Amount</span><span style="width:80px"></span><span style="width:100px;text-align:right">Cumulative</span><span style="width:90px;text-align:right">Paid On</span><span style="width:50px">Status</span></div>${rows}</div></div>`;
+  document.getElementById('userDetailSection').innerHTML=`<div class="user-detail-card"><div class="udc-banner"><div class="udc-banner-pattern"></div></div><div class="udc-profile"><div class="udc-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div class="udc-info"><div class="udc-name">${sanitize(m.name)}</div><div class="udc-meta">Slot #${m.slotNo} · ${sanitize(m.phone||'—')} · ${sanitize(m.email||'—')}</div></div></div><div class="udc-stats"><div class="udc-stat"><div class="udc-stat-val" style="color:var(--green)">${s.paid}</div><div class="udc-stat-lbl">Months Paid</div></div><div class="udc-stat"><div class="udc-stat-val" style="color:var(--red)">${s.pending}</div><div class="udc-stat-lbl">Pending</div></div><div class="udc-stat"><div class="udc-stat-val">${fmt(s.paidAmount)}</div><div class="udc-stat-lbl">Total Paid</div></div><div class="udc-stat"><div class="udc-stat-val">${pct}%</div><div class="udc-stat-lbl">Completion</div></div></div>${bm.length?`<div style="padding:16px 24px;background:var(--gold-pale);border-top:1px solid var(--border);border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏆 Chit Borrower — Receives the pot this month</div>${bm.map(b=>`<div style="font-size:13px;color:var(--ink)">Month ${b.month} · <strong>${fmt(b.amount)}</strong> received${b.split?' (split pot)':''} · ${fmtDate(b.date)}</div>`).join('')}</div>`:''}<div class="udc-payments"><div class="udc-payments-title">Payment History</div><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;font-size:11px;color:var(--slate)"><span style="width:30px">Sl</span><span style="width:90px">Date</span><span style="flex:1">Amount</span><span style="width:80px"></span><span style="width:100px;text-align:right">Cumulative</span><span style="width:90px;text-align:right">Paid On</span><span style="width:50px">Status</span></div>${rows}</div></div>`;
 }
 function showToast(msg,type='success'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3200)}
 
@@ -1022,7 +996,7 @@ function _exportCSV(){
     const p=state.payments[m.id]||{};
     const mc=Array.from({length:MONTH_COUNT},(_,i)=>{
       const mo=i+1;
-      if(getBorrowerIds(mo).includes(m.id))return'Exempt';
+      
       const e=p[mo];
       return e?.paid?(e.amount||SCHEDULE_DATA[mo-1][0]):0;
     });
