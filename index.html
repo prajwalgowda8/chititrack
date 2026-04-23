@@ -242,6 +242,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 </div>
 <div class="form-group"><label for="borrowerAmount">Total Pot (₹)</label><input type="number" id="borrowerAmount" value="325000" min="1" max="99999999" oninput="_borrCtx&&_updateBorrDist(_borrCtx)"></div>
 <div class="form-group"><label for="borrowerCommission">Commission (₹)</label><input type="number" id="borrowerCommission" value="16000" min="0" max="99999999"></div>
+<div class="form-group full" style="background:var(--gold-pale);border-radius:8px;padding:10px 12px;border:1px solid var(--gold-light)">
+  <label for="selfAmount" style="color:var(--gold)">💼 Keep for Self (₹) — Admin's own money</label>
+  <input type="number" id="selfAmount" value="0" min="0" max="99999999" placeholder="0" oninput="_borrCtx&&_updateBorrDist(_borrCtx)" style="border-color:var(--gold-light)">
+  <div style="font-size:11px;color:var(--slate);margin-top:4px">Amount admin keeps from this month's collection (counts as distributed)</div>
+</div>
 <div class="form-group full"><label>Distribution</label>
 <div id="borrowerDistribution" style="font-size:12px;color:var(--slate);padding:8px;background:var(--bg);border-radius:6px"></div>
 </div>
@@ -378,16 +383,21 @@ function computeCurrentMonth(){
 // ═══════════════════════════════════════════════
 function _buildDefaultPayments(){const p={};DEFAULT_MEMBERS.forEach(m=>{p[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){const[amt]=SCHEDULE_DATA[mo-1];p[m.id][mo]={paid:false,amount:amt,date:null,note:mo===2?'Commission':''}}});return p}
 function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;
-  // Month 2 is commission month: 2 borrowers × ₹2,82,000 each = ₹5,64,000 total pot
-  const pot=i===2?564000:CONFIG.POT_AMOUNT;
-  const defaultBids=i===2?[5,20]:(bid?[bid]:[]);  // Month 2: Harisha 1 (id:5) + Sushma Gowda 2 (id:20)
-  const defaultBid=i===2?5:bid;
-  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:defaultBid,borrowerMemberIds:defaultBids,cumulative:cum}}return s}
+  // Month 1: Nandan 1 (id:12) gets ₹3,00,000
+  // Month 2 commission: Harisha 1 (id:5) + Sushma Gowda 2 (id:20) get ₹2,82,000 each = ₹5,64,000
+  const pot=i===1?300000:i===2?564000:CONFIG.POT_AMOUNT;
+  const defaultBids=i===1?[12]:i===2?[5,20]:(bid?[bid]:[]);
+  const defaultBid=i===1?12:i===2?5:bid;
+  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:defaultBid,borrowerMemberIds:defaultBids,selfAmount:0,cumulative:cum}}return s}
 function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:_buildDefaultPayments(),schedule:_buildDefaultSchedule(),currentMonth:computeCurrentMonth(),nextId:DEFAULT_MEMBERS.length+1}}
 function _loadFromStorage(){try{const r=localStorage.getItem(CONFIG.STORAGE_KEY);if(!r)return null;const d=JSON.parse(r);if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;for(let i=1;i<=CONFIG.MONTH_COUNT;i++){if(d.schedule&&d.schedule[i]){const[amt,cum]=SCHEDULE_DATA[i-1];d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;// Migrate old single borrowerMemberId to borrowerMemberIds array
 if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
 // Always sync Month 2 pot amount to 564000 (2 borrowers × 282000)
-if(i===2){d.schedule[i].potAmount=564000;d.schedule[i].borrowerMemberIds=[5,20];d.schedule[i].borrowerMemberId=5;}}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
+if(i===2){d.schedule[i].potAmount=564000;d.schedule[i].borrowerMemberIds=[5,20];d.schedule[i].borrowerMemberId=5;}
+// Always sync Month 1 pot amount to 300000 (Nandan 1)
+if(i===1){d.schedule[i].potAmount=300000;d.schedule[i].borrowerMemberIds=[12];d.schedule[i].borrowerMemberId=12;}
+// Ensure selfAmount field exists
+if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
 function saveData(){try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('Save failed',e)}}
 const state=_loadFromStorage()||_freshState();
 
@@ -436,12 +446,12 @@ function recordPayment(mid,mo,{amount,date,note}){if(!state.payments[mid])state.
 function bulkMarkPaid(mo){const t=todayISO();state.members.forEach(m=>{if(!state.payments[m.id])state.payments[m.id]={};if(!state.payments[m.id][mo]?.paid){state.payments[m.id][mo]={paid:true,amount:SCHEDULE_DATA[mo-1][0],date:t,note:''}}});saveData()}
 function addMember(d){if(state.members.length>=CONFIG.MEMBER_COUNT_MAX)throw new Error(`Max ${CONFIG.MEMBER_COUNT_MAX} members`);const m={id:state.nextId++,name:String(d.name).trim(),phone:String(d.phone||'').trim(),email:String(d.email||'').trim(),amount:Number(d.amount)||CONFIG.MONTHLY_AMOUNT,slotNo:Number(d.slotNo)||state.members.length+1,borrowerMonth:Number(d.borrowerMonth)||null,notes:String(d.notes||'').trim()};state.members.push(m);state.payments[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){state.payments[m.id][mo]={paid:false,amount:m.amount,date:null,note:''}}if(m.borrowerMonth&&state.schedule[m.borrowerMonth]){state.schedule[m.borrowerMonth].borrowerMemberId=m.id;if(!Array.isArray(state.schedule[m.borrowerMonth].borrowerMemberIds))state.schedule[m.borrowerMonth].borrowerMemberIds=[];if(!state.schedule[m.borrowerMonth].borrowerMemberIds.includes(m.id))state.schedule[m.borrowerMonth].borrowerMemberIds.push(m.id)}saveData();return m}
 function deleteMember(id){state.members=state.members.filter(m=>m.id!==id);delete state.payments[id];Object.values(state.schedule).forEach(s=>{if(s.borrowerMemberId===id)s.borrowerMemberId=null;if(Array.isArray(s.borrowerMemberIds))s.borrowerMemberIds=s.borrowerMemberIds.filter(x=>x!==id)});saveData()}
-function assignBorrower(mo,{memberIds,potAmount,commission}){
+function assignBorrower(mo,{memberIds,potAmount,commission,selfAmount}){
   state.schedule[mo].borrowerMemberIds=Array.isArray(memberIds)?memberIds:memberIds?[memberIds]:[];
-  // keep legacy single field in sync for backward compat
   state.schedule[mo].borrowerMemberId=state.schedule[mo].borrowerMemberIds[0]||null;
   state.schedule[mo].potAmount=Number(potAmount)||CONFIG.POT_AMOUNT;
   state.schedule[mo].commission=Number(commission)||0;
+  state.schedule[mo].selfAmount=Number(selfAmount)||0;
   saveData();
 }
 
@@ -454,7 +464,7 @@ function getBorrowerIds(mo){
   return[];
 }
 
-/** Admin payment summary: collected, distributed, balance. */
+/** Admin payment summary: collected, distributed (to members + self), running balance. */
 function getPaymentSummary(){
   let collected=0;
   state.members.forEach(m=>{
@@ -464,9 +474,26 @@ function getPaymentSummary(){
   let distributed=0;
   for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){
     const ids=getBorrowerIds(mo);
-    if(ids.length>0)distributed+=state.schedule[mo].potAmount||CONFIG.POT_AMOUNT;
+    const sch=state.schedule[mo];
+    if(ids.length>0)distributed+=sch.potAmount||CONFIG.POT_AMOUNT;
+    if(sch.selfAmount>0)distributed+=sch.selfAmount;
   }
   return{collected,distributed,balance:collected-distributed};
+}
+
+/** Running balance per month: cumulative (collected - distributed) up to each month. */
+function getRunningBalance(){
+  const rows=[];
+  let running=0;
+  for(let mo=1;mo<=state.currentMonth;mo++){
+    const monthCollected=getMonthCollected(mo);
+    const sch=state.schedule[mo];
+    const ids=getBorrowerIds(mo);
+    const monthDistributed=(ids.length>0?sch.potAmount||CONFIG.POT_AMOUNT:0)+(sch.selfAmount||0);
+    running+=monthCollected-monthDistributed;
+    rows.push({mo,monthCollected,monthDistributed,running});
+  }
+  return rows;
 }
 
 // ═══════════════════════════════════════════════
@@ -716,6 +743,7 @@ function renderPaymentSummary(){
       <td style="padding:8px 12px;font-size:12px">${fmtDate(sch.date)}</td>
       <td style="padding:8px 12px;font-size:12px">${names}</td>
       <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(sch.potAmount)}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--gold)">${sch.selfAmount>0?fmt(sch.selfAmount):'—'}</td>
       <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${ids.length>1?`${ids.length} persons × ${fmt(share)} each`:'Full pot'}</td>
     </tr>`;
   }
@@ -733,7 +761,7 @@ function renderPaymentSummary(){
         <div style="background:var(--red-bg);border-radius:10px;padding:16px 20px;border:1px solid #fca5a5">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700">Total Distributed</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-top:6px">${fmt(distributed)}</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:3px">Pot amounts given to borrowers</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:3px">To borrowers + self</div>
         </div>
         <div style="background:${balance>=0?'var(--green-bg)':'var(--red-bg)'};border-radius:10px;padding:16px 20px;border:1px solid ${balance>=0?'#86efac':'#fca5a5'}">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${balColor};font-weight:700">${balLabel}</div>
@@ -741,18 +769,43 @@ function renderPaymentSummary(){
           <div style="font-size:11px;color:var(--slate);margin-top:3px">Collected − Distributed</div>
         </div>
       </div>
+      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Running Balance — Month by Month</div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--bg)">
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Collected</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Distributed</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month Net</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Running Balance</th>
+        </tr></thead>
+        <tbody>${getRunningBalance().map(r=>{
+          const net=r.monthCollected-r.monthDistributed;
+          const netColor=net>=0?'var(--green)':'var(--red)';
+          const runColor=r.running>=0?'var(--green)':'var(--red)';
+          return`<tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:8px 12px;font-size:12px;font-weight:600">Month ${r.mo}</td>
+            <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${fmtDate(DATES[r.mo-1])}</td>
+            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace">${fmt(r.monthCollected)}</td>
+            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--red)">${r.monthDistributed>0?fmt(r.monthDistributed):'—'}</td>
+            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace;color:${netColor};font-weight:600">${net>=0?'+':''}${fmt(net)}</td>
+            <td style="padding:8px 12px;font-size:13px;text-align:right;font-family:'JetBrains Mono',monospace;color:${runColor};font-weight:700">${fmt(r.running)}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
       ${distRows?`
-      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Borrower Distribution Log</div>
+      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px">Borrower Distribution Log</div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
         <thead><tr style="background:var(--bg)">
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Sl</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Borrower(s)</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Pot Amount</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Self Kept</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Split</th>
         </tr></thead>
         <tbody>${distRows}</tbody>
-      </table></div>`:'<div style="font-size:13px;color:var(--slate);text-align:center;padding:16px">No borrowers assigned yet</div>'}
+      </table></div>`:''}
     </div>`;
 }
 function renderMemberList(filter=''){const list=document.getElementById('memberList');const q=(filter||'').toLowerCase().trim();const members=state.members.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q));if(!members.length){list.innerHTML='<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">No members found</div></div>';return}list.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const pct=Math.round(s.paid/s.total*100);const isBorr=Object.keys(state.schedule).some(mo=>getBorrowerIds(parseInt(mo)).includes(m.id));const isBorrThisMo=getBorrowerIds(state.currentMonth).includes(m.id);const paid=(state.payments[m.id]||{})[state.currentMonth]?.paid;const sel=state._selectedMemberId===m.id?'selected':'';return`<div class="member-item ${sel}" role="button" tabindex="0" data-action="select-member" data-member-id="${m.id}"><div class="member-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="member-info"><div class="member-name">${sanitize(m.name)}</div><div class="member-meta"><span>Slot #${m.slotNo}</span>${isBorr?'<span class="badge badge-gold">Borrower</span>':''}${isBorrThisMo?'<span class="badge badge-gold">🏆 Exempt</span>':paid?'<span class="badge badge-green">✓ Paid</span>':'<span class="badge badge-red">Due</span>'}</div><div class="prog-bar-wrap mt-2"><div class="prog-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--slate);margin-top:2px">${s.paid}/${s.total} months</div></div></div>`}).join('')}
@@ -780,7 +833,7 @@ function renderPaymentGrid(mid){
     </div>`;
   }).join('');
 }
-function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' 🔒':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">—</span>'}</td><td>${isLocked?'—':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'—':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'—':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">Assign</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button></div>`}</td></tr>`}tb.innerHTML=h}
+function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';const isAssigned=borrowerIds.length>0||(sch.selfAmount||0)>0;h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' 🔒':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">—</span>'}</td><td>${isLocked?'—':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'—':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'—':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">${isAssigned?'✏ Edit':'Assign'}</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button></div>`}</td></tr>`}tb.innerHTML=h}
 function _populateMonthSelect(){const sel=document.getElementById('currentMonthSelect');sel.innerHTML=Array.from({length:state.currentMonth},(_,i)=>`<option value="${i+1}" ${i+1===state.currentMonth?'selected':''}>Month ${i+1} — ${fmtDate(DATES[i])}</option>`).join('')}
 function renderUserPage(){
   const wrap=document.getElementById('userSelectWrap');
@@ -916,7 +969,6 @@ function _openBorrModal(mo){
   document.getElementById('borrowerModalTitle').textContent=`Assign Borrower(s) — Month ${mo} (${fmtDate(DATES[mo-1])})`;
   const currentIds=getBorrowerIds(mo);
   const sch=state.schedule[mo];
-  // Build checkbox list
   const cbList=document.getElementById('borrowerCheckboxList');
   cbList.innerHTML=state.members.map(m=>`
     <label style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--gold-pale)'" onmouseout="this.style.background=''">
@@ -927,6 +979,7 @@ function _openBorrModal(mo){
     </label>`).join('');
   document.getElementById('borrowerAmount').value=sch?.potAmount||CONFIG.POT_AMOUNT;
   document.getElementById('borrowerCommission').value=sch?.commission||0;
+  document.getElementById('selfAmount').value=sch?.selfAmount||0;
   _updateBorrDist(mo);
   openModal('borrowerModal');
 }
@@ -934,13 +987,21 @@ function _openBorrModal(mo){
 function _updateBorrDist(mo){
   const checked=[...document.querySelectorAll('#borrowerCheckboxList input:checked')].map(cb=>parseInt(cb.value,10));
   const pot=parseInt(document.getElementById('borrowerAmount').value,10)||CONFIG.POT_AMOUNT;
+  const self=parseInt(document.getElementById('selfAmount').value,10)||0;
   const dist=document.getElementById('borrowerDistribution');
-  if(!checked.length){dist.textContent='No borrowers selected';return}
-  const share=Math.round(pot/checked.length);
-  const names=checked.map(id=>{const m=state.members.find(x=>x.id===id);return m?m.name:'?'});
-  dist.innerHTML=checked.length===1
-    ?`<span style="color:var(--green);font-weight:600">${names[0]}</span> receives full pot: <strong>${fmt(pot)}</strong>`
-    :`${checked.length} borrowers — each receives <strong>${fmt(share)}</strong><br><span style="color:var(--slate)">${names.join(', ')}</span>`;
+  let html='';
+  if(checked.length){
+    const share=Math.round(pot/checked.length);
+    const names=checked.map(id=>{const m=state.members.find(x=>x.id===id);return m?m.name:'?'});
+    html+=checked.length===1
+      ?`<div>👤 <span style="color:var(--green);font-weight:600">${names[0]}</span> receives: <strong>${fmt(pot)}</strong></div>`
+      :`<div>👥 ${checked.length} borrowers — each receives <strong>${fmt(share)}</strong></div><div style="color:var(--slate);font-size:11px">${names.join(', ')}</div>`;
+  }
+  if(self>0)html+=`<div style="margin-top:6px">💼 Admin keeps: <strong style="color:var(--gold)">${fmt(self)}</strong></div>`;
+  if(!checked.length&&!self)html='No borrowers selected and no self amount';
+  const total=pot+(self>0?self:0);
+  if(checked.length||self>0)html+=`<div style="margin-top:6px;font-size:11px;color:var(--slate)">Total out: ${fmt(checked.length?pot:0)}${self>0?' + '+fmt(self)+' (self)':''}</div>`;
+  dist.innerHTML=html||'No borrowers selected';
 }
 
 function _saveBorrower(){
@@ -948,9 +1009,10 @@ function _saveBorrower(){
   const memberIds=[...document.querySelectorAll('#borrowerCheckboxList input:checked')].map(cb=>parseInt(cb.value,10));
   const pot=parseInt(document.getElementById('borrowerAmount').value,10);
   const com=parseInt(document.getElementById('borrowerCommission').value,10);
-  assignBorrower(mo,{memberIds,potAmount:pot,commission:com});
+  const self=parseInt(document.getElementById('selfAmount').value,10)||0;
+  assignBorrower(mo,{memberIds,potAmount:pot,commission:com,selfAmount:self});
   closeModal('borrowerModal');
-  showToast(memberIds.length?`${memberIds.length} borrower(s) assigned for Month ${mo}`:'Borrowers cleared');
+  showToast(memberIds.length?`${memberIds.length} borrower(s) assigned for Month ${mo}`:'Month '+mo+' updated');
   renderAdmin();
   _borrCtx=null;
 }
