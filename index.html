@@ -626,15 +626,17 @@ function doLogout(){
   state._selectedUserId=null;
   document.getElementById('appShell').style.display='none';
   document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  document.getElementById('loginError').classList.remove('show');
+  // Safely clear fields — they exist since initApp already built the login screen
+  const u=document.getElementById('loginUser');
+  const p=document.getElementById('loginPass');
+  const err=document.getElementById('loginError');
+  if(u)u.value='';
+  if(p)p.value='';
+  if(err)err.classList.remove('show');
   switchLoginTab('admin');
 }
 
-// Enter key on password field
-document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
-document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+// Enter key listeners are attached inside initApp() after DOM rebuild
 
 // ═══════════════════════════════════════════════
 // RENDER
