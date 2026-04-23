@@ -391,18 +391,63 @@ function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i+
   const borrowerAmounts=i===1?{12:300000,20:284000}:i===2?{5:282000,20:282000}:{};
   s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:defaultBid,borrowerMemberIds:defaultBids,borrowerAmounts:borrowerAmounts,selfAmount:0,cumulative:cum}}return s}
 function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:_buildDefaultPayments(),schedule:_buildDefaultSchedule(),currentMonth:computeCurrentMonth(),nextId:DEFAULT_MEMBERS.length+1}}
-function _loadFromStorage(){try{const r=localStorage.getItem(CONFIG.STORAGE_KEY);if(!r)return null;const d=JSON.parse(r);if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;for(let i=1;i<=CONFIG.MONTH_COUNT;i++){if(d.schedule&&d.schedule[i]){const[amt,cum]=SCHEDULE_DATA[i-1];d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;// Migrate old single borrowerMemberId to borrowerMemberIds array
-if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
-// Always sync Month 2 pot amount to 564000 (2 borrowers × 282000)
-if(i===2){d.schedule[i].potAmount=564000;d.schedule[i].borrowerMemberIds=[5,20];d.schedule[i].borrowerMemberId=5;}
-// Always sync Month 1: Nandan 1 (300000) + Sushma Gowda 2 (284000) = 584000
-if(i===1){d.schedule[i].potAmount=584000;d.schedule[i].borrowerMemberIds=[12,20];d.schedule[i].borrowerMemberId=12;d.schedule[i].borrowerAmounts={12:300000,20:284000};}
-// Always sync Month 2: Harisha 1 + Sushma Gowda 2 (282000 each)
-if(i===2&&!d.schedule[i].borrowerAmounts){d.schedule[i].borrowerAmounts={5:282000,20:282000};}
-// Ensure selfAmount field exists
-if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
-function saveData(){try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('Save failed',e)}}
-const state=_loadFromStorage()||_freshState();
+// ═══════════════════════════════════════════════
+// SUPABASE — replaces localStorage
+// ═══════════════════════════════════════════════
+const SUPABASE_URL='https://tzfhufdhhmdotwwqyyav.supabase.co';
+const SUPABASE_KEY='sb_publishable_0dufejTHb5u5-JPV0ERILQ_kh9eg5-6';
+
+async function _loadFromSupabase(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/chittrack_data?id=eq.main&select=data`,{
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+    });
+    const rows=await res.json();
+    if(!rows||!rows[0]||!rows[0].data)return null;
+    const d=rows[0].data;
+    if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;
+    for(let i=1;i<=CONFIG.MONTH_COUNT;i++){
+      if(d.schedule&&d.schedule[i]){
+        const[amt,cum]=SCHEDULE_DATA[i-1];
+        d.schedule[i].date=DATES[i-1]||'';
+        d.schedule[i].depositAmount=amt;
+        d.schedule[i].cumulative=cum;
+        d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;
+        if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
+        if(i===1){d.schedule[i].potAmount=584000;d.schedule[i].borrowerMemberIds=[12,20];d.schedule[i].borrowerMemberId=12;d.schedule[i].borrowerAmounts={12:300000,20:284000};}
+        if(i===2){d.schedule[i].potAmount=564000;d.schedule[i].borrowerMemberIds=[5,20];d.schedule[i].borrowerMemberId=5;if(!d.schedule[i].borrowerAmounts)d.schedule[i].borrowerAmounts={5:282000,20:282000};}
+        if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;
+      }
+    }
+    d.currentMonth=computeCurrentMonth();
+    return d;
+  }catch(e){console.warn('Supabase load failed',e);return null;}
+}
+
+let _saveTimer=null;
+function saveData(){
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async()=>{
+    try{
+      const toSave={...state};
+      delete toSave._selectedMemberId;
+      delete toSave._selectedUserId;
+      delete toSave._viewMonth;
+      await fetch(`${SUPABASE_URL}/rest/v1/chittrack_data?id=eq.main`,{
+        method:'PATCH',
+        headers:{
+          'apikey':SUPABASE_KEY,
+          'Authorization':'Bearer '+SUPABASE_KEY,
+          'Content-Type':'application/json',
+          'Prefer':'return=minimal'
+        },
+        body:JSON.stringify({data:toSave,updated_at:new Date().toISOString()})
+      });
+    }catch(e){console.warn('Supabase save failed',e);}
+  },800);
+}
+
+const state=_freshState();
 
 function getMemberPaymentStats(mid){
   const p=state.payments[mid]||{};
@@ -1086,9 +1131,53 @@ function _exportCSV(){
 }
 
 // ═══════════════════════════════════════════════
-// INIT — show login screen, build member picker
+// INIT — load from Supabase then start app
 // ═══════════════════════════════════════════════
-buildMemberPicker();
+async function initApp(){
+  // Show spinner while loading from Supabase
+  document.getElementById('loginScreen').innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff">
+      <div style="width:48px;height:48px;border:4px solid rgba(201,168,76,.3);border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:.5px">Loading ChitTrack…</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.5)">Connecting to database</div>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+
+  const saved=await _loadFromSupabase();
+  if(saved){
+    Object.assign(state,saved);
+    state._selectedMemberId=null;
+    state._selectedUserId=null;
+    state._viewMonth=null;
+  }
+
+  // Rebuild login screen with real member data
+  document.getElementById('loginScreen').innerHTML=`
+    <div class="login-box">
+      <div class="login-logo">₹</div>
+      <div class="login-title">ChitTrack</div>
+      <div class="login-sub">Chit Fund Manager — Sign in to continue</div>
+      <div class="login-tabs">
+        <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">Admin</button>
+        <button class="login-tab" id="tabMember" onclick="switchLoginTab('member')">Member</button>
+      </div>
+      <div id="adminLoginForm" class="login-form">
+        <div><label for="loginUser">Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
+        <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="login-error" id="loginError">Incorrect username or password</div>
+        <button class="login-btn" onclick="doAdminLogin()">Sign In as Admin</button>
+      </div>
+      <div id="memberLoginForm" class="login-form" style="display:none">
+        <div><label>Select Your Name</label><div class="member-picker-grid" id="memberPickerGrid"></div></div>
+      </div>
+    </div>`;
+
+  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
+  document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+  buildMemberPicker();
+}
+
+initApp();
 </script>
 </body>
 </html>
