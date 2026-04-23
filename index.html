@@ -377,10 +377,15 @@ function computeCurrentMonth(){
 // STATE
 // ═══════════════════════════════════════════════
 function _buildDefaultPayments(){const p={};DEFAULT_MEMBERS.forEach(m=>{p[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){const[amt]=SCHEDULE_DATA[mo-1];p[m.id][mo]={paid:false,amount:amt,date:null,note:mo===2?'Commission':''}}});return p}
-function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:CONFIG.POT_AMOUNT,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:bid,borrowerMemberIds:bid?[bid]:[],cumulative:cum}}return s}
+function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;
+  // Month 2 is commission month: 2 borrowers × ₹2,82,000 each = ₹5,64,000 total pot
+  const pot=i===2?564000:CONFIG.POT_AMOUNT;
+  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:bid,borrowerMemberIds:bid?[bid]:[],cumulative:cum}}return s}
 function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:_buildDefaultPayments(),schedule:_buildDefaultSchedule(),currentMonth:computeCurrentMonth(),nextId:DEFAULT_MEMBERS.length+1}}
 function _loadFromStorage(){try{const r=localStorage.getItem(CONFIG.STORAGE_KEY);if(!r)return null;const d=JSON.parse(r);if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;for(let i=1;i<=CONFIG.MONTH_COUNT;i++){if(d.schedule&&d.schedule[i]){const[amt,cum]=SCHEDULE_DATA[i-1];d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;// Migrate old single borrowerMemberId to borrowerMemberIds array
-if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
+if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
+// Always sync Month 2 pot amount to 564000 (2 borrowers × 282000)
+if(i===2)d.schedule[i].potAmount=564000;}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
 function saveData(){try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('Save failed',e)}}
 const state=_loadFromStorage()||_freshState();
 
