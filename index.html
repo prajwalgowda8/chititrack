@@ -383,19 +383,22 @@ function computeCurrentMonth(){
 // ═══════════════════════════════════════════════
 function _buildDefaultPayments(){const p={};DEFAULT_MEMBERS.forEach(m=>{p[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){const[amt]=SCHEDULE_DATA[mo-1];p[m.id][mo]={paid:false,amount:amt,date:null,note:mo===2?'Commission':''}}});return p}
 function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;
-  // Month 1: Nandan 1 (id:12) gets ₹3,00,000
-  // Month 2 commission: Harisha 1 (id:5) + Sushma Gowda 2 (id:20) get ₹2,82,000 each = ₹5,64,000
-  const pot=i===1?300000:i===2?564000:CONFIG.POT_AMOUNT;
-  const defaultBids=i===1?[12]:i===2?[5,20]:(bid?[bid]:[]);
+  // Month 1: Nandan 1 (id:12) ₹3,00,000 + Sushma Gowda 2 (id:20) ₹2,84,000 = ₹5,84,000 total
+  // Month 2 commission: Harisha 1 (id:5) + Sushma Gowda 2 (id:20) ₹2,82,000 each = ₹5,64,000
+  const pot=i===1?584000:i===2?564000:CONFIG.POT_AMOUNT;
+  const defaultBids=i===1?[12,20]:i===2?[5,20]:(bid?[bid]:[]);
   const defaultBid=i===1?12:i===2?5:bid;
-  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:defaultBid,borrowerMemberIds:defaultBids,selfAmount:0,cumulative:cum}}return s}
+  const borrowerAmounts=i===1?{12:300000,20:284000}:i===2?{5:282000,20:282000}:{};
+  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:pot,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:defaultBid,borrowerMemberIds:defaultBids,borrowerAmounts:borrowerAmounts,selfAmount:0,cumulative:cum}}return s}
 function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:_buildDefaultPayments(),schedule:_buildDefaultSchedule(),currentMonth:computeCurrentMonth(),nextId:DEFAULT_MEMBERS.length+1}}
 function _loadFromStorage(){try{const r=localStorage.getItem(CONFIG.STORAGE_KEY);if(!r)return null;const d=JSON.parse(r);if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;for(let i=1;i<=CONFIG.MONTH_COUNT;i++){if(d.schedule&&d.schedule[i]){const[amt,cum]=SCHEDULE_DATA[i-1];d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;// Migrate old single borrowerMemberId to borrowerMemberIds array
 if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
 // Always sync Month 2 pot amount to 564000 (2 borrowers × 282000)
 if(i===2){d.schedule[i].potAmount=564000;d.schedule[i].borrowerMemberIds=[5,20];d.schedule[i].borrowerMemberId=5;}
-// Always sync Month 1 pot amount to 300000 (Nandan 1)
-if(i===1){d.schedule[i].potAmount=300000;d.schedule[i].borrowerMemberIds=[12];d.schedule[i].borrowerMemberId=12;}
+// Always sync Month 1: Nandan 1 (300000) + Sushma Gowda 2 (284000) = 584000
+if(i===1){d.schedule[i].potAmount=584000;d.schedule[i].borrowerMemberIds=[12,20];d.schedule[i].borrowerMemberId=12;d.schedule[i].borrowerAmounts={12:300000,20:284000};}
+// Always sync Month 2: Harisha 1 + Sushma Gowda 2 (282000 each)
+if(i===2&&!d.schedule[i].borrowerAmounts){d.schedule[i].borrowerAmounts={5:282000,20:282000};}
 // Ensure selfAmount field exists
 if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
 function saveData(){try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('Save failed',e)}}
