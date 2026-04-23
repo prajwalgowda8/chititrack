@@ -7,11 +7,11 @@ on:
 
 permissions:
   contents: read
-  pages:    write
+  pages: write
   id-token: write
 
 concurrency:
-  group:              pages
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url:  ${{ steps.deployment.outputs.page_url }}
-
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +30,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'          # deploy the whole repo root
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
