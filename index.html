@@ -629,9 +629,10 @@ function doLogout(){
   _showLoginScreen();
 }
 
-// Enter key listeners are attached inside initApp() after DOM rebuild
-// Also wire the static login button (before initApp replaces it)
+// Enter key listeners and button click — static HTML is never replaced now
 document.getElementById('adminLoginBtn').addEventListener('click', doAdminLogin);
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
+document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
 
 // ═══════════════════════════════════════════════
 // RENDER
@@ -1190,14 +1191,16 @@ function _exportCSV(){
 // INIT — load from Supabase then start app
 // ═══════════════════════════════════════════════
 async function initApp(){
-  // Show spinner while loading from Supabase
-  document.getElementById('loginScreen').innerHTML=`
-    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff">
-      <div style="width:48px;height:48px;border:4px solid rgba(201,168,76,.3);border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div>
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:.5px">Loading ChitTrack…</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.5)">Connecting to database</div>
-    </div>
+  // Show loading overlay on top of login screen (don't replace it)
+  const overlay=document.createElement('div');
+  overlay.id='loadingOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#1A1A2E,#2D2D4A);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:2000';
+  overlay.innerHTML=`
+    <div style="width:48px;height:48px;border:4px solid rgba(201,168,76,.3);border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div>
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#fff;letter-spacing:.5px">Loading ChitTrack…</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5)">Connecting to database</div>
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+  document.body.appendChild(overlay);
 
   try{
     const saved=await _loadFromSupabase();
@@ -1211,33 +1214,20 @@ async function initApp(){
     console.warn('Supabase load error, using defaults',e);
   }
 
-  _showLoginScreen();
+  // Remove overlay — login screen is already in the DOM and ready
+  overlay.remove();
+  buildMemberPicker();
 }
 
 function _showLoginScreen(){
-  document.getElementById('loginScreen').innerHTML=`
-    <div class="login-box">
-      <div class="login-logo">₹</div>
-      <div class="login-title">ChitTrack</div>
-      <div class="login-sub">Chit Fund Manager — Sign in to continue</div>
-      <div class="login-tabs">
-        <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">Admin</button>
-        <button class="login-tab" id="tabMember" onclick="switchLoginTab('member')">Member</button>
-      </div>
-      <div id="adminLoginForm" class="login-form">
-        <div><label for="loginUser">Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
-        <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
-        <div class="login-error" id="loginError">Incorrect username or password</div>
-        <button class="login-btn" id="adminLoginBtn">Sign In as Admin</button>
-      </div>
-      <div id="memberLoginForm" class="login-form" style="display:none">
-        <div><label>Select Your Name</label><div class="member-picker-grid" id="memberPickerGrid"></div></div>
-      </div>
-    </div>`;
-
-  document.getElementById('adminLoginBtn').addEventListener('click', doAdminLogin);
-  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
-  document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+  // Reset login form fields
+  const u=document.getElementById('loginUser');
+  const p=document.getElementById('loginPass');
+  const err=document.getElementById('loginError');
+  if(u)u.value='';
+  if(p)p.value='';
+  if(err)err.classList.remove('show');
+  switchLoginTab('admin');
   buildMemberPicker();
 }
 
