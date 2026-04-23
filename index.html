@@ -174,7 +174,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
     <div><label for="loginUser">Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
     <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
     <div class="login-error" id="loginError">Incorrect username or password</div>
-    <button class="login-btn" onclick="doAdminLogin()">Sign In as Admin</button>
+    <button class="login-btn" id="adminLoginBtn">Sign In as Admin</button>
   </div>
   <!-- Member login -->
   <div id="memberLoginForm" class="login-form" style="display:none">
@@ -626,17 +626,12 @@ function doLogout(){
   state._selectedUserId=null;
   document.getElementById('appShell').style.display='none';
   document.getElementById('loginScreen').classList.remove('hidden');
-  // Safely clear fields — they exist since initApp already built the login screen
-  const u=document.getElementById('loginUser');
-  const p=document.getElementById('loginPass');
-  const err=document.getElementById('loginError');
-  if(u)u.value='';
-  if(p)p.value='';
-  if(err)err.classList.remove('show');
-  switchLoginTab('admin');
+  _showLoginScreen();
 }
 
 // Enter key listeners are attached inside initApp() after DOM rebuild
+// Also wire the static login button (before initApp replaces it)
+document.getElementById('adminLoginBtn').addEventListener('click', doAdminLogin);
 
 // ═══════════════════════════════════════════════
 // RENDER
@@ -1204,15 +1199,22 @@ async function initApp(){
     </div>
     <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
 
-  const saved=await _loadFromSupabase();
-  if(saved){
-    Object.assign(state,saved);
-    state._selectedMemberId=null;
-    state._selectedUserId=null;
-    state._viewMonth=null;
+  try{
+    const saved=await _loadFromSupabase();
+    if(saved){
+      Object.assign(state,saved);
+      state._selectedMemberId=null;
+      state._selectedUserId=null;
+      state._viewMonth=null;
+    }
+  }catch(e){
+    console.warn('Supabase load error, using defaults',e);
   }
 
-  // Rebuild login screen with real member data
+  _showLoginScreen();
+}
+
+function _showLoginScreen(){
   document.getElementById('loginScreen').innerHTML=`
     <div class="login-box">
       <div class="login-logo">₹</div>
@@ -1226,13 +1228,14 @@ async function initApp(){
         <div><label for="loginUser">Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
         <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
         <div class="login-error" id="loginError">Incorrect username or password</div>
-        <button class="login-btn" onclick="doAdminLogin()">Sign In as Admin</button>
+        <button class="login-btn" id="adminLoginBtn">Sign In as Admin</button>
       </div>
       <div id="memberLoginForm" class="login-form" style="display:none">
         <div><label>Select Your Name</label><div class="member-picker-grid" id="memberPickerGrid"></div></div>
       </div>
     </div>`;
 
+  document.getElementById('adminLoginBtn').addEventListener('click', doAdminLogin);
   document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
   document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
   buildMemberPicker();
