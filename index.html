@@ -482,9 +482,25 @@ function getPaymentSummary(){
   let distributed=0;
   for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){
     const ids=getBorrowerIds(mo);
-    if(ids.length>0)distributed+=state.schedule[mo].potAmount||CONFIG.POT_AMOUNT;
+    const sch=state.schedule[mo];
+    if(ids.length>0)distributed+=sch.potAmount||0;
+    if(sch.selfAmount>0)distributed+=sch.selfAmount;
   }
   return{collected,distributed,balance:collected-distributed};
+}
+
+function getRunningBalance(){
+  const rows=[];
+  let running=0;
+  for(let mo=1;mo<=state.currentMonth;mo++){
+    const monthCollected=getMonthCollected(mo);
+    const sch=state.schedule[mo];
+    const ids=getBorrowerIds(mo);
+    const monthDistributed=(ids.length>0?sch.potAmount||0:0)+(sch.selfAmount||0);
+    running+=monthCollected-monthDistributed;
+    rows.push({mo,monthCollected,monthDistributed,running});
+  }
+  return rows;
 }
 
 // -----------------------------------------------
@@ -722,27 +738,50 @@ function renderPaymentSummary(){
   const{collected,distributed,balance}=getPaymentSummary();
   const balColor=balance>=0?'var(--green)':'var(--red)';
   const balLabel=balance>=0?'Balance in Hand':'Deficit';
+
+  // Build distribution log rows
   let distRows='';
   for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){
     const ids=getBorrowerIds(mo);
-    if(!ids.length)continue;
     const sch=state.schedule[mo];
-    const share=ids.length>1?Math.round(sch.potAmount/ids.length):sch.potAmount;
-    const names=ids.map(id=>{const m=state.members.find(x=>x.id===id);return m?sanitize(m.name):'?'}).join(', ');
+    const hasSelf=sch.selfAmount>0;
+    if(!ids.length&&!hasSelf)continue;
+    const ba=sch.borrowerAmounts||{};
+    const names=ids.map(id=>{
+      const m=state.members.find(x=>x.id===id);
+      const amt=ba[id]?` (${fmt(ba[id])})`:ids.length>1?` (${fmt(Math.round(sch.potAmount/ids.length))})`:` (${fmt(sch.potAmount)})`;
+      return m?sanitize(m.name)+amt:'?';
+    }).join(', ');
     distRows+=`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${mo}</td>
       <td style="padding:8px 12px;font-size:12px">${fmtDate(sch.date)}</td>
-      <td style="padding:8px 12px;font-size:12px">${names}</td>
-      <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(sch.potAmount)}</td>
-      <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${ids.length>1?`${ids.length} persons — ${fmt(share)} each`:'Full pot'}</td>
+      <td style="padding:8px 12px;font-size:12px">${names||'—'}</td>
+      <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace">${ids.length?fmt(sch.potAmount):'—'}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--gold)">${hasSelf?fmt(sch.selfAmount):'—'}</td>
     </tr>`;
   }
+
+  // Build running balance rows
+  const runRows=getRunningBalance().map(r=>{
+    const net=r.monthCollected-r.monthDistributed;
+    const netColor=net>=0?'var(--green)':'var(--red)';
+    const runColor=r.running>=0?'var(--green)':'var(--red)';
+    return`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:8px 12px;font-size:12px;font-weight:600">Month ${r.mo}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${fmtDate(DATES[r.mo-1])}</td>
+      <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;text-align:right">${fmt(r.monthCollected)}</td>
+      <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;text-align:right;color:var(--red)">${r.monthDistributed>0?fmt(r.monthDistributed):'—'}</td>
+      <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;text-align:right;color:${netColor};font-weight:600">${net>=0?'+':''}${fmt(net)}</td>
+      <td style="padding:8px 12px;font-size:13px;font-family:'JetBrains Mono',monospace;text-align:right;color:${runColor};font-weight:700">${fmt(r.running)}</td>
+    </tr>`;
+  }).join('');
+
   card.innerHTML=`
     <div class="card-header">
-      <span class="card-title"><span class="icon"></span>Payment Summary — All Months</span>
+      <span class="card-title"><span class="icon">💰</span>Payment Summary — All Months</span>
     </div>
     <div style="padding:20px">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
         <div style="background:var(--green-bg);border-radius:10px;padding:16px 20px;border:1px solid #86efac">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:700">Total Collected</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-top:6px">${fmt(collected)}</div>
@@ -751,26 +790,40 @@ function renderPaymentSummary(){
         <div style="background:var(--red-bg);border-radius:10px;padding:16px 20px;border:1px solid #fca5a5">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700">Total Distributed</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-top:6px">${fmt(distributed)}</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:3px">Pot amounts given to borrowers</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:3px">Pot given + self kept</div>
         </div>
         <div style="background:${balance>=0?'var(--green-bg)':'var(--red-bg)'};border-radius:10px;padding:16px 20px;border:1px solid ${balance>=0?'#86efac':'#fca5a5'}">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${balColor};font-weight:700">${balLabel}</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:${balColor};margin-top:6px">${fmt(Math.abs(balance))}</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:3px">Collected 🔒 Distributed</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:3px">Collected − Distributed</div>
         </div>
       </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Running Balance — Month by Month</div>
+      <div style="overflow-x:auto;margin-bottom:24px"><table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--bg)">
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Collected</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Distributed</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month Net</th>
+          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Running Balance</th>
+        </tr></thead>
+        <tbody>${runRows||'<tr><td colspan="6" style="padding:16px;text-align:center;color:var(--slate)">No data yet</td></tr>'}</tbody>
+      </table></div>
+
       ${distRows?`
       <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Borrower Distribution Log</div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
         <thead><tr style="background:var(--bg)">
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Sl</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Borrower(s)</th>
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Pot Amount</th>
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Split</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Borrower(s) &amp; Amount</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Total Pot</th>
+          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--gold);font-weight:600;border-bottom:1px solid var(--border)">💼 Self Kept</th>
         </tr></thead>
         <tbody>${distRows}</tbody>
-      </table></div>`:'<div style="font-size:13px;color:var(--slate);text-align:center;padding:16px">No borrowers assigned yet</div>'}
+      </table></div>`:''}
     </div>`;
 }
 function renderMemberList(filter=''){const list=document.getElementById('memberList');const q=(filter||'').toLowerCase().trim();const members=state.members.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q));if(!members.length){list.innerHTML='<div class="empty-state"><div class="es-icon"></div><div class="es-title">No members found</div></div>';return}list.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const pct=Math.round(s.paid/s.total*100);const isBorr=Object.keys(state.schedule).some(mo=>getBorrowerIds(parseInt(mo)).includes(m.id));const isBorrThisMo=getBorrowerIds(state.currentMonth).includes(m.id);const paid=(state.payments[m.id]||{})[state.currentMonth]?.paid;const sel=state._selectedMemberId===m.id?'selected':'';return`<div class="member-item ${sel}" role="button" tabindex="0" data-action="select-member" data-member-id="${m.id}"><div class="member-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="member-info"><div class="member-name">${sanitize(m.name)}</div><div class="member-meta"><span>Slot #${m.slotNo}</span>${isBorr?'<span class="badge badge-gold">Borrower</span>':''}${isBorrThisMo?'<span class="badge badge-gold"> Exempt</span>':paid?'<span class="badge badge-green"> Paid</span>':'<span class="badge badge-red">Due</span>'}</div><div class="prog-bar-wrap mt-2"><div class="prog-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--slate);margin-top:2px">${s.paid}/${s.total} months</div></div></div>`}).join('')}
@@ -798,7 +851,7 @@ function renderPaymentGrid(mid){
     </div>`;
   }).join('');
 }
-function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' ':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">—</span>'}</td><td>${isLocked?'—':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'—':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'—':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">Assign</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button><button class="btn btn-outline btn-sm" data-action="open-mark-paid" data-month="${m}">Mark Selected</button></div>`}</td></tr>`}tb.innerHTML=h}
+function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const isAssigned=borrowerIds.length>0||(sch.selfAmount||0)>0;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' ':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">—</span>'}</td><td>${isLocked?'—':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'—':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'—':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">${isAssigned?'✏ Edit':'Assign'}</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button><button class="btn btn-outline btn-sm" data-action="open-mark-paid" data-month="${m}">Mark Selected</button></div>`}</td></tr>`}tb.innerHTML=h}
 function _populateMonthSelect(){const sel=document.getElementById('currentMonthSelect');sel.innerHTML=Array.from({length:state.currentMonth},(_,i)=>`<option value="${i+1}" ${i+1===state.currentMonth?'selected':''}>Month ${i+1} — ${fmtDate(DATES[i])}</option>`).join('')}
 function renderUserPage(){
   const wrap=document.getElementById('userSelectWrap');
