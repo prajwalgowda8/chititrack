@@ -334,7 +334,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 // ═══════════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════════
-const CONFIG={STORAGE_KEY:'chittrack_v2',MONTH_COUNT:26,MEMBER_COUNT_MAX:25,MONTHLY_AMOUNT:13000,POT_AMOUNT:325000,COMMISSION:16000,ADMIN_USER:'admin',ADMIN_PASS:'chit2026'};
+const CONFIG={STORAGE_KEY:'chittrack_v2',MONTH_COUNT:26,MEMBER_COUNT_MAX:25,MONTHLY_AMOUNT:13000,POT_AMOUNT:325000,COMMISSION:16000};
 const DATES=['2026-03-05','2026-04-05','2026-05-05','2026-06-05','2026-07-05','2026-08-05','2026-09-05','2026-10-05','2026-11-05','2026-12-05','2027-01-05','2027-02-05','2027-03-05','2027-04-05','2027-05-05','2027-06-05','2027-07-05','2027-08-05','2027-09-05','2027-10-05','2027-11-05','2027-12-05','2028-01-05','2028-02-05','2028-03-05','2028-04-05'];
 const SCHEDULE_DATA=[[13000,282000],[16000,null],[13000,284000],[13000,286000],[13000,288000],[13000,290000],[13000,292000],[13000,295000],[13000,298000],[13000,301000],[13000,304000],[13000,308000],[13000,312000],[13000,317000],[13000,321000],[13000,325000],[13000,331000],[13000,337000],[13000,343000],[13000,349000],[13000,355000],[13000,363000],[13000,371000],[13000,380000],[13000,390000],[13000,400000]];
 const AVATAR_COLORS=['#FDE68A','#BFDBFE','#BBF7D0','#FECACA','#DDD6FE','#FED7AA','#CFFAFE','#FCE7F3','#D1FAE5','#FEF9C3','#E0E7FF','#FFE4E6','#F0FDF4','#EFF6FF','#FFF7ED','#FDF2F8','#F0F9FF','#FEFCE8','#F7FEE7','#FFF1F2','#ECFDF5','#EEF2FF','#FDF4FF','#FFFBEB','#F0FDFA'];
@@ -412,12 +412,26 @@ function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:
 const SUPABASE_URL='https://tzfhufdhhmdotwwqyyav.supabase.co';
 const SUPABASE_KEY='sb_publishable_0dufejTHb5u5-JPV0ERILQ_kh9eg5-6';
 
+async function _sbFetch(path,opts){
+  opts=opts||{};
+  const headers=Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},opts.headers||{});
+  const res=await fetch(SUPABASE_URL+path,Object.assign({},opts,{headers}));
+  if(!res.ok)throw new Error('Supabase '+res.status);
+  const t=await res.text();
+  return t?JSON.parse(t):null;
+}
+
+async function _checkAdminCreds(username,password){
+  try{
+    const rows=await _sbFetch('/rest/v1/chittrack_admin?id=eq.admin&select=username,password_hash');
+    if(!rows||!rows[0])return false;
+    return rows[0].username===username&&rows[0].password_hash===btoa(username+':'+password);
+  }catch(e){console.warn('Auth check failed',e);return false;}
+}
+
 async function _loadFromSupabase(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/chittrack_data?id=eq.main&select=data`,{
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
-    });
-    const rows=await res.json();
+    const rows=await _sbFetch('/rest/v1/chittrack_data?id=eq.main&select=data');
     if(!rows||!rows[0]||!rows[0].data)return null;
     const d=rows[0].data;
     if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;
@@ -443,18 +457,13 @@ function saveData(){
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(async()=>{
     try{
-      const toSave={...state};
+      const toSave=Object.assign({},state);
       delete toSave._selectedMemberId;
       delete toSave._selectedUserId;
       delete toSave._viewMonth;
-      await fetch(`${SUPABASE_URL}/rest/v1/chittrack_data?id=eq.main`,{
+      await _sbFetch('/rest/v1/chittrack_data?id=eq.main',{
         method:'PATCH',
-        headers:{
-          'apikey':SUPABASE_KEY,
-          'Authorization':'Bearer '+SUPABASE_KEY,
-          'Content-Type':'application/json',
-          'Prefer':'return=minimal'
-        },
+        headers:{'Prefer':'return=minimal'},
         body:JSON.stringify({data:toSave,updated_at:new Date().toISOString()})
       });
     }catch(e){console.warn('Supabase save failed',e);}
@@ -584,15 +593,26 @@ function doAdminLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
-  if(u===CONFIG.ADMIN_USER&&p===CONFIG.ADMIN_PASS){
-    err.classList.remove('show');
-    session={role:'admin',memberId:null,memberName:'Admin'};
-    enterApp();
-  } else {
+  const btn=document.getElementById('adminLoginBtn');
+  if(!u||!p){err.textContent='Enter username and password';err.classList.add('show');return;}
+  btn.disabled=true;btn.textContent='Checking…';
+  _checkAdminCreds(u,p).then(ok=>{
+    btn.disabled=false;btn.textContent='Sign In as Admin';
+    if(ok){
+      err.classList.remove('show');
+      session={role:'admin',memberId:null,memberName:'Admin'};
+      enterApp();
+    }else{
+      err.textContent='Incorrect username or password';
+      err.classList.add('show');
+      document.getElementById('loginPass').value='';
+      document.getElementById('loginPass').focus();
+    }
+  }).catch(()=>{
+    btn.disabled=false;btn.textContent='Sign In as Admin';
+    err.textContent='Connection error — check internet and try again';
     err.classList.add('show');
-    document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
-  }
+  });
 }
 
 function doMemberLogin(memberId){
