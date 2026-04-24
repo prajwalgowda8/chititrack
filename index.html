@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+﻿∩╗┐<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChitTrack — Chit Fund Manager</title>
+<title>ChitTrack ΓÇö Chit Fund Manager</title>
 <meta name="theme-color" content="#1A1A2E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,7 +147,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 .toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .2s ease;display:flex;align-items:center;gap:8px;max-width:320px}
 @keyframes toastIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
-.toast.success::before{content:"✓";color:var(--gold);font-weight:700}.toast.error::before{content:"✕";color:#f87171;font-weight:700}
+.toast.success::before{content:"Γ£ô";color:var(--gold);font-weight:700}.toast.error::before{content:"Γ£ò";color:#f87171;font-weight:700}
 .empty-state{text-align:center;padding:48px 20px;color:var(--slate)}
 .empty-state .es-icon{font-size:40px;margin-bottom:12px}.empty-state .es-title{font-size:15px;font-weight:600;color:var(--ink)}.empty-state .es-sub{font-size:13px;margin-top:4px}
 .flex{display:flex}.flex-1{flex:1}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}.justify-between{justify-content:space-between}
@@ -159,12 +159,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 </head>
 <body>
 
-<!-- ═══ LOGIN SCREEN ═══ -->
+<!-- ΓòÉΓòÉΓòÉ LOGIN SCREEN ΓòÉΓòÉΓòÉ -->
 <div class="login-screen" id="loginScreen">
 <div class="login-box">
-  <div class="login-logo">₹</div>
+  <div class="login-logo">Γé╣</div>
   <div class="login-title">ChitTrack</div>
-  <div class="login-sub">Chit Fund Manager — Sign in to continue</div>
+  <div class="login-sub">Chit Fund Manager ΓÇö Sign in to continue</div>
   <div class="login-tabs">
     <button class="login-tab active" id="tabAdmin" onclick="switchLoginTab('admin')">Admin</button>
     <button class="login-tab" id="tabMember" onclick="switchLoginTab('member')">Member</button>
@@ -172,9 +172,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
   <!-- Admin login -->
   <div id="adminLoginForm" class="login-form">
     <div><label for="loginUser">Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
-    <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+    <div><label for="loginPass">Password</label><input type="password" id="loginPass" placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó" autocomplete="current-password"></div>
     <div class="login-error" id="loginError">Incorrect username or password</div>
-    <button class="login-btn" id="adminLoginBtn">Sign In as Admin</button>
+    <button class="login-btn" onclick="doAdminLogin()">Sign In as Admin</button>
   </div>
   <!-- Member login -->
   <div id="memberLoginForm" class="login-form" style="display:none">
@@ -183,10 +183,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 </div>
 </div>
 
-<!-- ═══ APP SHELL (hidden until logged in) ═══ -->
+<!-- ΓòÉΓòÉΓòÉ APP SHELL (hidden until logged in) ΓòÉΓòÉΓòÉ -->
 <div id="appShell" style="display:none">
 <nav class="top-nav">
-  <div class="nav-brand"><div class="nav-logo">₹</div><span class="nav-title">ChitTrack</span></div>
+  <div class="nav-brand"><div class="nav-logo">Γé╣</div><span class="nav-title">ChitTrack</span></div>
   <div class="nav-tabs" id="navTabs">
     <button class="nav-tab active" data-action="show-page" data-page="admin">Admin Dashboard</button>
     <button class="nav-tab" data-action="show-page" data-page="user">Member View</button>
@@ -203,12 +203,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 <!-- MODALS -->
 <div class="modal-overlay" id="addMemberModal">
 <div class="modal">
-<div class="modal-header"><span class="modal-title">Add New Member</span><button class="modal-close" data-action="close-modal" data-modal="addMemberModal">✕</button></div>
+<div class="modal-header"><span class="modal-title">Add New Member</span><button class="modal-close" data-action="close-modal" data-modal="addMemberModal">Γ£ò</button></div>
 <div class="modal-body"><div class="form-grid">
 <div class="form-group"><label for="mName">Full Name *</label><input type="text" id="mName" maxlength="80" required></div>
 <div class="form-group"><label for="mPhone">Phone</label><input type="tel" id="mPhone" maxlength="15"></div>
 <div class="form-group"><label for="mEmail">Email</label><input type="email" id="mEmail" maxlength="100"></div>
-<div class="form-group"><label for="mAmount">Monthly (₹)</label><input type="number" id="mAmount" value="13000" min="1" max="9999999"></div>
+<div class="form-group"><label for="mAmount">Monthly (Γé╣)</label><input type="number" id="mAmount" value="13000" min="1" max="9999999"></div>
 <div class="form-group"><label for="mSlot">Slot #</label><input type="number" id="mSlot" min="1" max="25"></div>
 <div class="form-group"><label for="mBorrowerMonth">Borrower Month</label><input type="number" id="mBorrowerMonth" min="1" max="26"></div>
 <div class="form-group full"><label for="mNotes">Notes</label><textarea id="mNotes" rows="2" maxlength="300"></textarea></div>
@@ -220,10 +220,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 
 <div class="modal-overlay" id="paymentModal">
 <div class="modal">
-<div class="modal-header"><span class="modal-title" id="paymentModalTitle">Record Payment</span><button class="modal-close" data-action="close-modal" data-modal="paymentModal">✕</button></div>
+<div class="modal-header"><span class="modal-title" id="paymentModalTitle">Record Payment</span><button class="modal-close" data-action="close-modal" data-modal="paymentModal">Γ£ò</button></div>
 <div class="modal-body"><div class="form-grid">
 <div class="form-group"><label for="payDate">Date</label><input type="date" id="payDate"></div>
-<div class="form-group"><label for="payAmount">Amount (₹)</label><input type="number" id="payAmount" min="1" max="9999999"></div>
+<div class="form-group"><label for="payAmount">Amount (Γé╣)</label><input type="number" id="payAmount" min="1" max="9999999"></div>
 <div class="form-group full"><label for="payNote">Note</label><input type="text" id="payNote" maxlength="200"></div>
 </div></div>
 <div class="modal-footer">
@@ -232,58 +232,32 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 </div></div></div>
 
 <div class="modal-overlay" id="borrowerModal">
-<div class="modal" style="width:600px">
-<div class="modal-header"><span class="modal-title" id="borrowerModalTitle">Assign Borrower(s)</span><button class="modal-close" data-action="close-modal" data-modal="borrowerModal">✕</button></div>
+<div class="modal">
+<div class="modal-header"><span class="modal-title" id="borrowerModalTitle">Assign Borrower(s)</span><button class="modal-close" data-action="close-modal" data-modal="borrowerModal">Γ£ò</button></div>
 <div class="modal-body">
+<p class="text-sm text-slate" style="margin-bottom:14px">Select one or more members as borrowers for this month. Each receives an equal share of the pot.</p>
 <div class="form-grid">
-<div class="form-group full">
-  <label>Select Members &amp; Enter Amount Given to Each</label>
-  <div id="borrowerCheckboxList" style="max-height:280px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px"></div>
+<div class="form-group full"><label>Select Borrower(s)</label>
+<div id="borrowerCheckboxList" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:10px"></div>
 </div>
-<div class="form-group full" style="background:var(--gold-pale);border-radius:8px;padding:10px 12px;border:1px solid var(--gold-light)">
-  <label for="selfAmount" style="color:var(--gold)">💼 Keep for Self (₹)</label>
-  <input type="number" id="selfAmount" value="0" min="0" max="99999999" placeholder="0" oninput="_borrCtx&&_updateBorrDist(_borrCtx)" style="border-color:var(--gold-light)">
-  <div style="font-size:11px;color:var(--slate);margin-top:4px">Amount admin keeps from this month's collection</div>
-</div>
-<div class="form-group"><label for="borrowerCommission">Commission (₹)</label><input type="number" id="borrowerCommission" value="0" min="0" max="99999999"></div>
-<div class="form-group full">
-  <div id="borrowerDistribution" style="font-size:13px;padding:10px;background:var(--bg);border-radius:6px;min-height:36px"></div>
+<div class="form-group"><label for="borrowerAmount">Total Pot (Γé╣)</label><input type="number" id="borrowerAmount" value="325000" min="1" max="99999999" oninput="_borrCtx&&_updateBorrDist(_borrCtx)"></div>
+<div class="form-group"><label for="borrowerCommission">Commission (Γé╣)</label><input type="number" id="borrowerCommission" value="16000" min="0" max="99999999"></div>
+<div class="form-group full"><label>Distribution</label>
+<div id="borrowerDistribution" style="font-size:12px;color:var(--slate);padding:8px;background:var(--bg);border-radius:6px"></div>
 </div>
 </div></div>
 <div class="modal-footer">
 <button class="btn btn-outline" data-action="close-modal" data-modal="borrowerModal">Cancel</button>
-<button class="btn btn-primary" data-action="save-borrower">Save</button>
-</div></div></div>
-
-<!-- Multi-select Mark Paid Modal -->
-<div class="modal-overlay" id="markPaidModal">
-<div class="modal">
-<div class="modal-header"><span class="modal-title" id="markPaidTitle">Mark Members Paid</span><button class="modal-close" data-action="close-modal" data-modal="markPaidModal">✕</button></div>
-<div class="modal-body">
-<div style="display:flex;gap:8px;margin-bottom:12px">
-  <button class="btn btn-outline btn-sm" onclick="document.querySelectorAll('#markPaidList input').forEach(c=>c.checked=true)">Select All</button>
-  <button class="btn btn-outline btn-sm" onclick="document.querySelectorAll('#markPaidList input').forEach(c=>c.checked=false)">Clear All</button>
-</div>
-<div id="markPaidList" style="max-height:320px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px"></div>
-<div style="margin-top:12px;display:flex;gap:12px;align-items:center">
-  <div class="form-group" style="flex:1">
-    <label for="markPaidDate">Payment Date</label>
-    <input type="date" id="markPaidDate">
-  </div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="btn btn-outline" data-action="close-modal" data-modal="markPaidModal">Cancel</button>
-<button class="btn btn-primary" data-action="save-mark-paid">Mark Paid</button>
+<button class="btn btn-primary" data-action="save-borrower">Assign Borrower(s)</button>
 </div></div></div>
 
 <!-- ADMIN PAGE -->
 <main id="page-admin" class="page active">
 <div class="admin-wrap">
 <div class="page-header">
-<div><h1 class="page-title">Admin Dashboard</h1><p class="page-subtitle">25 Members · 26 Months · ₹13,000/month</p></div>
+<div><h1 class="page-title">Admin Dashboard</h1><p class="page-subtitle">25 Members ┬╖ 26 Months ┬╖ Γé╣13,000/month</p></div>
 <div class="flex gap-2">
-<button class="btn btn-outline" data-action="export-csv">⬇ Export CSV</button>
+<button class="btn btn-outline" data-action="export-csv">Γ¼ç Export CSV</button>
 <button class="btn btn-primary" data-action="open-add-member">+ Add Member</button>
 </div></div>
 
@@ -303,14 +277,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 <div class="main-grid">
 <div class="card">
 <div class="card-header"><span class="card-title"><span class="icon">&#x1F465;</span>Members</span>
-<input type="search" id="memberSearch" placeholder="Search…" style="width:130px;padding:5px 10px;font-size:12px"></div>
+<input type="search" id="memberSearch" placeholder="SearchΓÇª" style="width:130px;padding:5px 10px;font-size:12px"></div>
 <div class="member-list" id="memberList"></div>
 </div>
 <div class="card" id="memberDetailCard">
-<div class="empty-state"><div class="es-icon">👆</div><div class="es-title">Select a member</div><div class="es-sub">Click any member to view details</div></div>
+<div class="empty-state"><div class="es-icon">≡ƒæå</div><div class="es-title">Select a member</div><div class="es-sub">Click any member to view details</div></div>
 </div></div>
 <div class="card">
-<div class="card-header"><span class="card-title"><span class="icon">📅</span>Month-wise Schedule</span>
+<div class="card-header"><span class="card-title"><span class="icon">≡ƒôà</span>Month-wise Schedule</span>
 </div>
 <div class="schedule-table-wrap"><table class="schedule-table">
 <thead><tr><th>Sl</th><th>Date</th><th>Amount Deposited</th><th>Cumulative</th><th>Paid</th><th>Unpaid</th><th>Collection %</th><th>Borrower</th><th>Action</th></tr></thead>
@@ -325,16 +299,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 <div class="user-select-wrap" id="userSelectWrap"></div>
 <div id="userDetailSection">
 <div class="empty-state" style="background:var(--bg-card);border-radius:14px;border:1px solid var(--border)">
-<div class="es-icon">🔍</div><div class="es-title">Select a member above</div><div class="es-sub">Payment history will appear here</div>
+<div class="es-icon">≡ƒöì</div><div class="es-title">Select a member above</div><div class="es-sub">Payment history will appear here</div>
 </div></div></div></main>
 </div><!-- end appShell -->
 
 <script>
 'use strict';
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // CONSTANTS
-// ═══════════════════════════════════════════════
-const CONFIG={STORAGE_KEY:'chittrack_v2',MONTH_COUNT:26,MEMBER_COUNT_MAX:25,MONTHLY_AMOUNT:13000,POT_AMOUNT:325000,COMMISSION:16000};
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+const CONFIG={STORAGE_KEY:'chittrack_v2',MONTH_COUNT:26,MEMBER_COUNT_MAX:25,MONTHLY_AMOUNT:13000,POT_AMOUNT:325000,COMMISSION:16000,ADMIN_USER:'admin',ADMIN_PASS:'chit2026'};
 const DATES=['2026-03-05','2026-04-05','2026-05-05','2026-06-05','2026-07-05','2026-08-05','2026-09-05','2026-10-05','2026-11-05','2026-12-05','2027-01-05','2027-02-05','2027-03-05','2027-04-05','2027-05-05','2027-06-05','2027-07-05','2027-08-05','2027-09-05','2027-10-05','2027-11-05','2027-12-05','2028-01-05','2028-02-05','2028-03-05','2028-04-05'];
 const SCHEDULE_DATA=[[13000,282000],[16000,null],[13000,284000],[13000,286000],[13000,288000],[13000,290000],[13000,292000],[13000,295000],[13000,298000],[13000,301000],[13000,304000],[13000,308000],[13000,312000],[13000,317000],[13000,321000],[13000,325000],[13000,331000],[13000,337000],[13000,343000],[13000,349000],[13000,355000],[13000,363000],[13000,371000],[13000,380000],[13000,390000],[13000,400000]];
 const AVATAR_COLORS=['#FDE68A','#BFDBFE','#BBF7D0','#FECACA','#DDD6FE','#FED7AA','#CFFAFE','#FCE7F3','#D1FAE5','#FEF9C3','#E0E7FF','#FFE4E6','#F0FDF4','#EFF6FF','#FFF7ED','#FDF2F8','#F0F9FF','#FEFCE8','#F7FEE7','#FFF1F2','#ECFDF5','#EEF2FF','#FDF4FF','#FFFBEB','#F0FDFA'];
@@ -366,113 +340,49 @@ const DEFAULT_MEMBERS=[
   {id:25,name:'Yogesh Amma (Praju)',phone:'9538531912', email:'', amount:13000, slotNo:25, borrowerMonth:25, notes:''},
 ];
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // UTILS
-// ═══════════════════════════════════════════════
-function fmt(n){return'₹'+Number(n).toLocaleString('en-IN')}
-function fmtDate(d){if(!d)return'—';const p=String(d).split('-');if(p.length!==3)return d;const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${parseInt(p[2],10)} ${M[parseInt(p[1],10)-1]} ${p[0].slice(2)}`}
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+function fmt(n){return'Γé╣'+Number(n).toLocaleString('en-IN')}
+function fmtDate(d){if(!d)return'ΓÇö';const p=String(d).split('-');if(p.length!==3)return d;const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${parseInt(p[2],10)} ${M[parseInt(p[1],10)-1]} ${p[0].slice(2)}`}
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()}
 function avatarColor(id){return AVATAR_COLORS[(id-1)%AVATAR_COLORS.length]}
 function sanitize(s){const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML}
 function clamp(v,a,b){return Math.min(Math.max(v,a),b)}
 function todayISO(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // AUTO-ADVANCE: compute unlocked months from today's date.
 // Rule: Month 1 is always unlocked.
 //       Month N (N>1) unlocks when today >= date of Month N-1.
 //       i.e. once a month's due date arrives, the NEXT month opens for collection.
 // Example: today = 1 Apr 2026
-//   Month 1 date = 5 Mar 2026 → today >= 5 Mar → Month 2 unlocks ✓
-//   Month 2 date = 5 Apr 2026 → today < 5 Apr  → Month 3 stays locked ✓
-// ═══════════════════════════════════════════════
+//   Month 1 date = 5 Mar 2026 ΓåÆ today >= 5 Mar ΓåÆ Month 2 unlocks Γ£ô
+//   Month 2 date = 5 Apr 2026 ΓåÆ today < 5 Apr  ΓåÆ Month 3 stays locked Γ£ô
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function computeCurrentMonth(){
   const today=new Date();
   today.setHours(0,0,0,0);
   // Month 1 always unlocked; month N unlocks when today >= DATES[N-2]
   let mo=1;
   for(let i=1;i<DATES.length;i++){
-    const prevDate=new Date(DATES[i-1]); // date of month i (0-indexed → month i+1)
+    const prevDate=new Date(DATES[i-1]); // date of month i (0-indexed ΓåÆ month i+1)
     if(today>=prevDate) mo=i+1;
     else break;
   }
   return clamp(mo,1,CONFIG.MONTH_COUNT);
 }
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // STATE
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function _buildDefaultPayments(){const p={};DEFAULT_MEMBERS.forEach(m=>{p[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){const[amt]=SCHEDULE_DATA[mo-1];p[m.id][mo]={paid:false,amount:amt,date:null,note:mo===2?'Commission':''}}});return p}
-function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;
-  s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:CONFIG.POT_AMOUNT,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:null,borrowerMemberIds:[],borrowerAmounts:{},selfAmount:0,cumulative:cum}return s}
+function _buildDefaultSchedule(){const s={};for(let i=1;i<=CONFIG.MONTH_COUNT;i++){const[amt,cum]=SCHEDULE_DATA[i-1];const bid=DEFAULT_MEMBERS[i-1]?.id??null;s[i]={date:DATES[i-1]||'',depositAmount:amt,potAmount:CONFIG.POT_AMOUNT,commission:i===2?CONFIG.COMMISSION:0,borrowerMemberId:bid,borrowerMemberIds:bid?[bid]:[],cumulative:cum}}return s}
 function _freshState(){return{members:DEFAULT_MEMBERS.map(m=>({...m})),payments:_buildDefaultPayments(),schedule:_buildDefaultSchedule(),currentMonth:computeCurrentMonth(),nextId:DEFAULT_MEMBERS.length+1}}
-// ═══════════════════════════════════════════════
-// SUPABASE — replaces localStorage
-// ═══════════════════════════════════════════════
-const SUPABASE_URL='https://tzfhufdhhmdotwwqyyav.supabase.co';
-const SUPABASE_KEY='sb_publishable_0dufejTHb5u5-JPV0ERILQ_kh9eg5-6';
-
-async function _sbFetch(path,opts){
-  opts=opts||{};
-  const headers=Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},opts.headers||{});
-  const res=await fetch(SUPABASE_URL+path,Object.assign({},opts,{headers}));
-  if(!res.ok)throw new Error('Supabase '+res.status);
-  const t=await res.text();
-  return t?JSON.parse(t):null;
-}
-
-async function _checkAdminCreds(username,password){
-  // Hardcoded fallback (always works even if Supabase is down)
-  if(username==='admin'&&password==='chit2026')return true;
-  try{
-    const rows=await _sbFetch('/rest/v1/chittrack_admin?id=eq.admin&select=username,password_hash');
-    if(!rows||!rows[0])return false;
-    return rows[0].username===username&&rows[0].password_hash===btoa(username+':'+password);
-  }catch(e){console.warn('Auth check failed',e);return false;}
-}
-
-async function _loadFromSupabase(){
-  try{
-    const rows=await _sbFetch('/rest/v1/chittrack_data?id=eq.main&select=data');
-    if(!rows||!rows[0]||!rows[0].data)return null;
-    const d=rows[0].data;
-    if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;
-    for(let i=1;i<=CONFIG.MONTH_COUNT;i++){
-      if(d.schedule&&d.schedule[i]){
-        const[amt,cum]=SCHEDULE_DATA[i-1];
-        d.schedule[i].date=DATES[i-1]||'';
-        d.schedule[i].depositAmount=amt;
-        d.schedule[i].cumulative=cum;
-        d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;
-        if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}
-        if(!d.schedule[i].borrowerAmounts)d.schedule[i].borrowerAmounts={};
-        if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;
-      }
-    }
-    d.currentMonth=computeCurrentMonth();
-    return d;
-  }catch(e){console.warn('Supabase load failed',e);return null;}
-}
-
-let _saveTimer=null;
-function saveData(){
-  clearTimeout(_saveTimer);
-  _saveTimer=setTimeout(async()=>{
-    try{
-      const toSave=Object.assign({},state);
-      delete toSave._selectedMemberId;
-      delete toSave._selectedUserId;
-      delete toSave._viewMonth;
-      await _sbFetch('/rest/v1/chittrack_data?id=eq.main',{
-        method:'PATCH',
-        headers:{'Prefer':'return=minimal'},
-        body:JSON.stringify({data:toSave,updated_at:new Date().toISOString()})
-      });
-    }catch(e){console.warn('Supabase save failed',e);}
-  },800);
-}
-
-const state=_freshState();
+function _loadFromStorage(){try{const r=localStorage.getItem(CONFIG.STORAGE_KEY);if(!r)return null;const d=JSON.parse(r);if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;for(let i=1;i<=CONFIG.MONTH_COUNT;i++){if(d.schedule&&d.schedule[i]){const[amt,cum]=SCHEDULE_DATA[i-1];d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[]}}}d.currentMonth=computeCurrentMonth();return d}catch(_){return null}}
+function saveData(){try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state))}catch(e){console.warn('Save failed',e)}}
+// Note: saveData is overridden below by Supabase version
+const state=_loadFromStorage()||_freshState();
 
 function getMemberPaymentStats(mid){
   const p=state.payments[mid]||{};
@@ -519,12 +429,12 @@ function recordPayment(mid,mo,{amount,date,note}){if(!state.payments[mid])state.
 function bulkMarkPaid(mo){const t=todayISO();state.members.forEach(m=>{if(!state.payments[m.id])state.payments[m.id]={};if(!state.payments[m.id][mo]?.paid){state.payments[m.id][mo]={paid:true,amount:SCHEDULE_DATA[mo-1][0],date:t,note:''}}});saveData()}
 function addMember(d){if(state.members.length>=CONFIG.MEMBER_COUNT_MAX)throw new Error(`Max ${CONFIG.MEMBER_COUNT_MAX} members`);const m={id:state.nextId++,name:String(d.name).trim(),phone:String(d.phone||'').trim(),email:String(d.email||'').trim(),amount:Number(d.amount)||CONFIG.MONTHLY_AMOUNT,slotNo:Number(d.slotNo)||state.members.length+1,borrowerMonth:Number(d.borrowerMonth)||null,notes:String(d.notes||'').trim()};state.members.push(m);state.payments[m.id]={};for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){state.payments[m.id][mo]={paid:false,amount:m.amount,date:null,note:''}}if(m.borrowerMonth&&state.schedule[m.borrowerMonth]){state.schedule[m.borrowerMonth].borrowerMemberId=m.id;if(!Array.isArray(state.schedule[m.borrowerMonth].borrowerMemberIds))state.schedule[m.borrowerMonth].borrowerMemberIds=[];if(!state.schedule[m.borrowerMonth].borrowerMemberIds.includes(m.id))state.schedule[m.borrowerMonth].borrowerMemberIds.push(m.id)}saveData();return m}
 function deleteMember(id){state.members=state.members.filter(m=>m.id!==id);delete state.payments[id];Object.values(state.schedule).forEach(s=>{if(s.borrowerMemberId===id)s.borrowerMemberId=null;if(Array.isArray(s.borrowerMemberIds))s.borrowerMemberIds=s.borrowerMemberIds.filter(x=>x!==id)});saveData()}
-function assignBorrower(mo,{memberIds,potAmount,commission,selfAmount}){
+function assignBorrower(mo,{memberIds,potAmount,commission}){
   state.schedule[mo].borrowerMemberIds=Array.isArray(memberIds)?memberIds:memberIds?[memberIds]:[];
+  // keep legacy single field in sync for backward compat
   state.schedule[mo].borrowerMemberId=state.schedule[mo].borrowerMemberIds[0]||null;
   state.schedule[mo].potAmount=Number(potAmount)||CONFIG.POT_AMOUNT;
   state.schedule[mo].commission=Number(commission)||0;
-  state.schedule[mo].selfAmount=Number(selfAmount)||0;
   saveData();
 }
 
@@ -537,7 +447,7 @@ function getBorrowerIds(mo){
   return[];
 }
 
-/** Admin payment summary: collected, distributed (to members + self), running balance. */
+/** Admin payment summary: collected, distributed, balance. */
 function getPaymentSummary(){
   let collected=0;
   state.members.forEach(m=>{
@@ -547,31 +457,14 @@ function getPaymentSummary(){
   let distributed=0;
   for(let mo=1;mo<=CONFIG.MONTH_COUNT;mo++){
     const ids=getBorrowerIds(mo);
-    const sch=state.schedule[mo];
-    if(ids.length>0)distributed+=sch.potAmount||CONFIG.POT_AMOUNT;
-    if(sch.selfAmount>0)distributed+=sch.selfAmount;
+    if(ids.length>0)distributed+=state.schedule[mo].potAmount||CONFIG.POT_AMOUNT;
   }
   return{collected,distributed,balance:collected-distributed};
 }
 
-/** Running balance per month: cumulative (collected - distributed) up to each month. */
-function getRunningBalance(){
-  const rows=[];
-  let running=0;
-  for(let mo=1;mo<=state.currentMonth;mo++){
-    const monthCollected=getMonthCollected(mo);
-    const sch=state.schedule[mo];
-    const ids=getBorrowerIds(mo);
-    const monthDistributed=(ids.length>0?sch.potAmount||CONFIG.POT_AMOUNT:0)+(sch.selfAmount||0);
-    running+=monthCollected-monthDistributed;
-    rows.push({mo,monthCollected,monthDistributed,running});
-  }
-  return rows;
-}
-
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // AUTH
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 let session={role:null,memberId:null,memberName:null}; // role: 'admin' | 'member'
 
 function switchLoginTab(tab){
@@ -595,29 +488,15 @@ function doAdminLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
   const err=document.getElementById('loginError');
-  const btn=document.getElementById('adminLoginBtn');
-  if(!u||!p){err.textContent='Enter username and password';err.classList.add('show');return;}
-  btn.disabled=true;btn.textContent='Checking\u2026';
-  (async()=>{
-    try{
-      const ok=await _checkAdminCreds(u,p);
-      btn.disabled=false;btn.textContent='Sign In as Admin';
-      if(ok){
-        err.classList.remove('show');
-        session={role:'admin',memberId:null,memberName:'Admin'};
-        enterApp();
-      }else{
-        err.textContent='Incorrect username or password';
-        err.classList.add('show');
-        document.getElementById('loginPass').value='';
-        document.getElementById('loginPass').focus();
-      }
-    }catch(e){
-      btn.disabled=false;btn.textContent='Sign In as Admin';
-      err.textContent='Error: '+e.message;
-      err.classList.add('show');
-    }
-  })();
+  if(u===CONFIG.ADMIN_USER&&p===CONFIG.ADMIN_PASS){
+    err.classList.remove('show');
+    session={role:'admin',memberId:null,memberName:'Admin'};
+    enterApp();
+  } else {
+    err.classList.add('show');
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
 }
 
 function doMemberLogin(memberId){
@@ -651,17 +530,19 @@ function doLogout(){
   state._selectedUserId=null;
   document.getElementById('appShell').style.display='none';
   document.getElementById('loginScreen').classList.remove('hidden');
-  _showLoginScreen();
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginError').classList.remove('show');
+  switchLoginTab('admin');
 }
 
-// Enter key listeners and button click — static HTML is never replaced now
-document.getElementById('adminLoginBtn').addEventListener('click', doAdminLogin);
+// Enter key on password field
 document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin()});
 document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // RENDER
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function renderAdmin(){
   _renderMonthFilterBtns();
   renderStats();
@@ -705,7 +586,7 @@ function renderStats(){
     pending=getMonthPending(vm);
     const ms=getMonthStats(vm);
     paidCount=ms.paid; unpaidCount=ms.unpaid;
-    label=`Month ${vm} — ${fmtDate(DATES[vm-1])}`;
+    label=`Month ${vm} ΓÇö ${fmtDate(DATES[vm-1])}`;
   }
   const viewLabel=vm===null?'All months':'Month '+vm;
   document.getElementById('statsRow').innerHTML=`
@@ -727,7 +608,7 @@ function renderStats(){
     <div class="stat-card green">
       <div class="stat-label">Paid</div>
       <div class="stat-value">${paidCount}</div>
-      <div class="stat-sub">${unpaidCount} pending · ${label}</div>
+      <div class="stat-sub">${unpaidCount} pending ┬╖ ${label}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Months Unlocked</div>
@@ -739,10 +620,10 @@ function renderStats(){
 function renderPaymentSummary(){
   const vm=state._viewMonth; // null=all, number=specific month
   const card=document.getElementById('paymentSummaryCard');
-  const viewLabel=vm===null?'All Months':`Month ${vm} — ${fmtDate(DATES[vm-1])}`;
+  const viewLabel=vm===null?'All Months':`Month ${vm} ΓÇö ${fmtDate(DATES[vm-1])}`;
 
   if(vm!==null){
-    // ── Single month view ──
+    // ΓöÇΓöÇ Single month view ΓöÇΓöÇ
     const mo=vm;
     const sch=state.schedule[mo];
     const ms=getMonthStats(mo);
@@ -760,19 +641,19 @@ function renderPaymentSummary(){
       const e=(state.payments[m.id]||{})[mo];
       const paid=isBorr?null:(e?.paid||false);
       const amt=isBorr?null:(e?.amount||SCHEDULE_DATA[mo-1][0]);
-      const dateStr=isBorr?'—':(e?.date?fmtDate(e.date):'—');
+      const dateStr=isBorr?'ΓÇö':(e?.date?fmtDate(e.date):'ΓÇö');
       return`<tr style="border-bottom:1px solid var(--border)">
         <td style="padding:8px 12px"><div style="display:flex;align-items:center;gap:8px"><div class="member-avatar" style="width:26px;height:26px;font-size:10px;background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><span style="font-size:13px">${sanitize(m.name)}</span></div></td>
         <td style="padding:8px 12px;font-size:12px;color:var(--slate)">Slot #${m.slotNo}</td>
-        <td style="padding:8px 12px">${isBorr?'<span class="badge badge-gold">🏆 Borrower</span>':paid?`<span class="badge badge-green">✓ Paid</span>`:'<span class="badge badge-red">Due</span>'}</td>
-        <td style="padding:8px 12px;font-family:\'JetBrains Mono\',monospace;font-size:12px">${isBorr?'—':fmt(amt)}</td>
+        <td style="padding:8px 12px">${isBorr?'<span class="badge badge-gold">≡ƒÅå Borrower</span>':paid?`<span class="badge badge-green">Γ£ô Paid</span>`:'<span class="badge badge-red">Due</span>'}</td>
+        <td style="padding:8px 12px;font-family:\'JetBrains Mono\',monospace;font-size:12px">${isBorr?'ΓÇö':fmt(amt)}</td>
         <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${dateStr}</td>
       </tr>`;
     }).join('');
 
     card.innerHTML=`
       <div class="card-header">
-        <span class="card-title"><span class="icon">💰</span>Payment Summary — ${viewLabel}</span>
+        <span class="card-title"><span class="icon">≡ƒÆ░</span>Payment Summary ΓÇö ${viewLabel}</span>
       </div>
       <div style="padding:20px">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
@@ -794,10 +675,10 @@ function renderPaymentSummary(){
           <div style="background:${balance>=0?'var(--green-bg)':'var(--red-bg)'};border-radius:10px;padding:14px 16px;border:1px solid ${balance>=0?'#86efac':'#fca5a5'}">
             <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${balColor};font-weight:700">${balance>=0?'Balance':'Deficit'}</div>
             <div style="font-family:'DM Serif Display',serif;font-size:22px;color:${balColor};margin-top:4px">${fmt(Math.abs(balance))}</div>
-            <div style="font-size:11px;color:var(--slate);margin-top:2px">Collected − Pot Given</div>
+            <div style="font-size:11px;color:var(--slate);margin-top:2px">Collected ΓêÆ Pot Given</div>
           </div>
         </div>
-        <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Member Payment Status — Month ${mo}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Member Payment Status ΓÇö Month ${mo}</div>
         <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
           <thead><tr style="background:var(--bg)">
             <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Member</th>
@@ -812,7 +693,7 @@ function renderPaymentSummary(){
     return;
   }
 
-  // ── All months view ──
+  // ΓöÇΓöÇ All months view ΓöÇΓöÇ
   const{collected,distributed,balance}=getPaymentSummary();
   const balColor=balance>=0?'var(--green)':'var(--red)';
   const balLabel=balance>=0?'Balance in Hand':'Deficit';
@@ -828,13 +709,12 @@ function renderPaymentSummary(){
       <td style="padding:8px 12px;font-size:12px">${fmtDate(sch.date)}</td>
       <td style="padding:8px 12px;font-size:12px">${names}</td>
       <td style="padding:8px 12px;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(sch.potAmount)}</td>
-      <td style="padding:8px 12px;font-size:12px;color:var(--gold)">${sch.selfAmount>0?fmt(sch.selfAmount):'—'}</td>
-      <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${ids.length>1?`${ids.length} persons × ${fmt(share)} each`:'Full pot'}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${ids.length>1?`${ids.length} persons ├ù ${fmt(share)} each`:'Full pot'}</td>
     </tr>`;
   }
   card.innerHTML=`
     <div class="card-header">
-      <span class="card-title"><span class="icon">💰</span>Payment Summary — All Months</span>
+      <span class="card-title"><span class="icon">≡ƒÆ░</span>Payment Summary ΓÇö All Months</span>
     </div>
     <div style="padding:20px">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
@@ -846,55 +726,30 @@ function renderPaymentSummary(){
         <div style="background:var(--red-bg);border-radius:10px;padding:16px 20px;border:1px solid #fca5a5">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--red);font-weight:700">Total Distributed</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-top:6px">${fmt(distributed)}</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:3px">To borrowers + self</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:3px">Pot amounts given to borrowers</div>
         </div>
         <div style="background:${balance>=0?'var(--green-bg)':'var(--red-bg)'};border-radius:10px;padding:16px 20px;border:1px solid ${balance>=0?'#86efac':'#fca5a5'}">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:${balColor};font-weight:700">${balLabel}</div>
           <div style="font-family:'DM Serif Display',serif;font-size:24px;color:${balColor};margin-top:6px">${fmt(Math.abs(balance))}</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:3px">Collected − Distributed</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:3px">Collected ΓêÆ Distributed</div>
         </div>
       </div>
-      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Running Balance — Month by Month</div>
-      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
-        <thead><tr style="background:var(--bg)">
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month</th>
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
-          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Collected</th>
-          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Distributed</th>
-          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Month Net</th>
-          <th style="padding:8px 12px;text-align:right;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Running Balance</th>
-        </tr></thead>
-        <tbody>${getRunningBalance().map(r=>{
-          const net=r.monthCollected-r.monthDistributed;
-          const netColor=net>=0?'var(--green)':'var(--red)';
-          const runColor=r.running>=0?'var(--green)':'var(--red)';
-          return`<tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:8px 12px;font-size:12px;font-weight:600">Month ${r.mo}</td>
-            <td style="padding:8px 12px;font-size:12px;color:var(--slate)">${fmtDate(DATES[r.mo-1])}</td>
-            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace">${fmt(r.monthCollected)}</td>
-            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--red)">${r.monthDistributed>0?fmt(r.monthDistributed):'—'}</td>
-            <td style="padding:8px 12px;font-size:12px;text-align:right;font-family:'JetBrains Mono',monospace;color:${netColor};font-weight:600">${net>=0?'+':''}${fmt(net)}</td>
-            <td style="padding:8px 12px;font-size:13px;text-align:right;font-family:'JetBrains Mono',monospace;color:${runColor};font-weight:700">${fmt(r.running)}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table></div>
       ${distRows?`
-      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px">Borrower Distribution Log</div>
+      <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Borrower Distribution Log</div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
         <thead><tr style="background:var(--bg)">
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Sl</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Date</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Borrower(s)</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Pot Amount</th>
-          <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Self Kept</th>
           <th style="padding:8px 12px;text-align:left;font-size:11px;color:var(--slate);font-weight:600;border-bottom:1px solid var(--border)">Split</th>
         </tr></thead>
         <tbody>${distRows}</tbody>
-      </table></div>`:''}
+      </table></div>`:'<div style="font-size:13px;color:var(--slate);text-align:center;padding:16px">No borrowers assigned yet</div>'}
     </div>`;
 }
-function renderMemberList(filter=''){const list=document.getElementById('memberList');const q=(filter||'').toLowerCase().trim();const members=state.members.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q));if(!members.length){list.innerHTML='<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">No members found</div></div>';return}list.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const pct=Math.round(s.paid/s.total*100);const isBorr=Object.keys(state.schedule).some(mo=>getBorrowerIds(parseInt(mo)).includes(m.id));const isBorrThisMo=getBorrowerIds(state.currentMonth).includes(m.id);const paid=(state.payments[m.id]||{})[state.currentMonth]?.paid;const sel=state._selectedMemberId===m.id?'selected':'';return`<div class="member-item ${sel}" role="button" tabindex="0" data-action="select-member" data-member-id="${m.id}"><div class="member-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="member-info"><div class="member-name">${sanitize(m.name)}</div><div class="member-meta"><span>Slot #${m.slotNo}</span>${isBorr?'<span class="badge badge-gold">Borrower</span>':''}${isBorrThisMo?'<span class="badge badge-gold">🏆 Exempt</span>':paid?'<span class="badge badge-green">✓ Paid</span>':'<span class="badge badge-red">Due</span>'}</div><div class="prog-bar-wrap mt-2"><div class="prog-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--slate);margin-top:2px">${s.paid}/${s.total} months</div></div></div>`}).join('')}
-function renderMemberDetail(id){const m=state.members.find(x=>x.id===id);if(!m)return;const s=getMemberPaymentStats(id);const pct=Math.round(s.paid/s.total*100);const bm=Object.keys(state.schedule).filter(mo=>getBorrowerIds(parseInt(mo)).includes(id)).map(mo=>'Month '+mo);document.getElementById('memberDetailCard').innerHTML=`<div class="detail-header"><div class="detail-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div style="flex:1"><div class="detail-name">${sanitize(m.name)}</div><div class="detail-sub"><span>📞 ${sanitize(m.phone||'—')}</span><span>✉ ${sanitize(m.email||'—')}</span><span>Slot #${m.slotNo}</span>${bm.length?`<span class="badge badge-gold">🏆 ${sanitize(bm.join(', '))}</span>`:''}</div><div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap"><div style="font-size:12px;color:var(--green);font-weight:600">✓ Paid: ${s.paid} months (${fmt(s.paidAmount)})</div><div style="font-size:12px;color:var(--red);font-weight:600">⚠ Pending: ${s.pending} months</div></div><div class="prog-bar-wrap mt-2" style="height:8px"><div class="prog-bar-fill" style="width:${pct}%"></div></div></div><button class="btn btn-danger btn-sm" data-action="delete-member" data-member-id="${id}">Delete</button></div><div style="padding:14px 20px 4px;font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:1px">Payment Grid — Click any cell to record payment</div><div class="payment-grid" id="paymentGrid_${id}"></div>`;renderPaymentGrid(id)}
+function renderMemberList(filter=''){const list=document.getElementById('memberList');const q=(filter||'').toLowerCase().trim();const members=state.members.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q));if(!members.length){list.innerHTML='<div class="empty-state"><div class="es-icon">≡ƒöì</div><div class="es-title">No members found</div></div>';return}list.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const pct=Math.round(s.paid/s.total*100);const isBorr=Object.keys(state.schedule).some(mo=>getBorrowerIds(parseInt(mo)).includes(m.id));const isBorrThisMo=getBorrowerIds(state.currentMonth).includes(m.id);const paid=(state.payments[m.id]||{})[state.currentMonth]?.paid;const sel=state._selectedMemberId===m.id?'selected':'';return`<div class="member-item ${sel}" role="button" tabindex="0" data-action="select-member" data-member-id="${m.id}"><div class="member-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="member-info"><div class="member-name">${sanitize(m.name)}</div><div class="member-meta"><span>Slot #${m.slotNo}</span>${isBorr?'<span class="badge badge-gold">Borrower</span>':''}${isBorrThisMo?'<span class="badge badge-gold">≡ƒÅå Exempt</span>':paid?'<span class="badge badge-green">Γ£ô Paid</span>':'<span class="badge badge-red">Due</span>'}</div><div class="prog-bar-wrap mt-2"><div class="prog-bar-fill" style="width:${pct}%"></div></div><div style="font-size:10px;color:var(--slate);margin-top:2px">${s.paid}/${s.total} months</div></div></div>`}).join('')}
+function renderMemberDetail(id){const m=state.members.find(x=>x.id===id);if(!m)return;const s=getMemberPaymentStats(id);const pct=Math.round(s.paid/s.total*100);const bm=Object.keys(state.schedule).filter(mo=>getBorrowerIds(parseInt(mo)).includes(id)).map(mo=>'Month '+mo);document.getElementById('memberDetailCard').innerHTML=`<div class="detail-header"><div class="detail-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div style="flex:1"><div class="detail-name">${sanitize(m.name)}</div><div class="detail-sub"><span>≡ƒô₧ ${sanitize(m.phone||'ΓÇö')}</span><span>Γ£ë ${sanitize(m.email||'ΓÇö')}</span><span>Slot #${m.slotNo}</span>${bm.length?`<span class="badge badge-gold">≡ƒÅå ${sanitize(bm.join(', '))}</span>`:''}</div><div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap"><div style="font-size:12px;color:var(--green);font-weight:600">Γ£ô Paid: ${s.paid} months (${fmt(s.paidAmount)})</div><div style="font-size:12px;color:var(--red);font-weight:600">ΓÜá Pending: ${s.pending} months</div></div><div class="prog-bar-wrap mt-2" style="height:8px"><div class="prog-bar-fill" style="width:${pct}%"></div></div></div><button class="btn btn-danger btn-sm" data-action="delete-member" data-member-id="${id}">Delete</button></div><div style="padding:14px 20px 4px;font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:1px">Payment Grid ΓÇö Click any cell to record payment</div><div class="payment-grid" id="paymentGrid_${id}"></div>`;renderPaymentGrid(id)}
 function renderPaymentGrid(mid){
   const grid=document.getElementById('paymentGrid_'+mid);
   if(!grid)return;
@@ -907,24 +762,24 @@ function renderPaymentGrid(mid){
     const isFut=mo>state.currentMonth;
     const isBorrower=getBorrowerIds(mo).includes(mid);
     const cls=isFut?'future':(isComm?'commission':(e.paid?'paid':'unpaid'));
-    const st=isFut?'🔒 Locked':(isComm?'Commission':(e.paid?'Paid':'Unpaid'));
+    const st=isFut?'≡ƒöÆ Locked':(isComm?'Commission':(e.paid?'Paid':'Unpaid'));
     const sc=isFut?'future':(e.paid?'paid':'unpaid');
     const ca=isFut?'':`data-action="open-payment" data-member-id="${mid}" data-month="${mo}"`;
     return`<div class="payment-cell ${cls}" role="${isFut?'presentation':'button'}" tabindex="${isFut?-1:0}" ${ca}>
-      <div class="pc-month">Month ${mo} · ${fmtDate(sch?.date)}${isBorrower?' 🏆':''}</div>
+      <div class="pc-month">Month ${mo} ┬╖ ${fmtDate(sch?.date)}${isBorrower?' ≡ƒÅå':''}</div>
       <div class="pc-amount">${fmt(e.amount||SCHEDULE_DATA[mo-1][0])}</div>
       ${e.note?`<div class="pc-status" style="color:var(--gold)">${sanitize(e.note)}</div>`:''}
-      <div class="pc-status ${sc}">${st}${e.date?' · '+fmtDate(e.date):''}</div>
+      <div class="pc-status ${sc}">${st}${e.date?' ┬╖ '+fmtDate(e.date):''}</div>
     </div>`;
   }).join('');
 }
-function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';const isAssigned=borrowerIds.length>0||(sch.selfAmount||0)>0;h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' 🔒':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">—</span>'}</td><td>${isLocked?'—':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'—':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'—':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">${isAssigned?'✏ Edit':'Assign'}</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button><button class="btn btn-outline btn-sm" data-action="open-mark-paid" data-month="${m}">Mark Selected</button></div>`}</td></tr>`}tb.innerHTML=h}
-function _populateMonthSelect(){const sel=document.getElementById('currentMonthSelect');sel.innerHTML=Array.from({length:state.currentMonth},(_,i)=>`<option value="${i+1}" ${i+1===state.currentMonth?'selected':''}>Month ${i+1} — ${fmtDate(DATES[i])}</option>`).join('')}
+function renderSchedule(){const tb=document.getElementById('scheduleBody');let h='';for(let m=1;m<=CONFIG.MONTH_COUNT;m++){const sch=state.schedule[m];const ms=getMonthStats(m);const pct=state.members.length?Math.round(ms.paid/state.members.length*100):0;const borrowerIds=getBorrowerIds(m);const borrowers=borrowerIds.map(id=>state.members.find(x=>x.id===id)).filter(Boolean);const isCur=m===state.currentMonth;const isPast=m<state.currentMonth;const isLocked=m>state.currentMonth;const borrowerCell=borrowers.length?`<div style="display:flex;flex-direction:column;gap:3px">${borrowers.map(b=>`<div style="display:flex;align-items:center;gap:5px"><div class="member-avatar" style="width:20px;height:20px;font-size:8px;background:${avatarColor(b.id)}">${sanitize(initials(b.name))}</div><span style="font-size:12px">${sanitize(b.name)}</span></div>`).join('')}${borrowers.length>1?`<span style="font-size:10px;color:var(--gold)">Split: ${fmt(Math.round(sch.potAmount/borrowers.length))} each</span>`:''}</div>`:'<span class="text-xs text-slate">Not assigned</span>';h+=`<tr class="${isCur?'current-month-row':''} ${isLocked?'locked-row':''}"><td><span class="mono font-bold">${m}</span>${isLocked?' ≡ƒöÆ':''}</td><td>${fmtDate(sch.date)}</td><td class="mono">${fmt(sch.depositAmount||CONFIG.MONTHLY_AMOUNT)}</td><td class="mono">${sch.cumulative!=null?fmt(sch.cumulative):'<span style="color:var(--slate)">ΓÇö</span>'}</td><td>${isLocked?'ΓÇö':`<span class="badge badge-green">${ms.paid} paid</span>`}</td><td>${isLocked?'ΓÇö':`<span class="${ms.unpaid>0?'badge badge-red':'badge badge-green'}">${ms.unpaid} due</span>`}</td><td>${isLocked?'ΓÇö':`<div style="display:flex;align-items:center;gap:8px"><div class="prog-bar-wrap" style="width:80px;height:5px;display:inline-block"><div class="prog-bar-fill" style="width:${pct}%"></div></div><span class="text-xs font-mono">${pct}%</span></div>`}</td><td>${borrowerCell}</td><td>${isLocked?'<span class="text-xs text-slate">Locked</span>':`<div style="display:flex;gap:4px">${!isPast?`<button class="btn btn-outline btn-sm" data-action="open-borrower" data-month="${m}">Assign</button>`:''}<button class="btn btn-outline btn-sm" data-action="bulk-pay" data-month="${m}">Mark All</button></div>`}</td></tr>`}tb.innerHTML=h}
+function _populateMonthSelect(){const sel=document.getElementById('currentMonthSelect');sel.innerHTML=Array.from({length:state.currentMonth},(_,i)=>`<option value="${i+1}" ${i+1===state.currentMonth?'selected':''}>Month ${i+1} ΓÇö ${fmtDate(DATES[i])}</option>`).join('')}
 function renderUserPage(){
   const wrap=document.getElementById('userSelectWrap');
   // If member role, only show their own card
   const members=session.role==='member'?state.members.filter(m=>m.id===session.memberId):state.members;
-  wrap.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const t=(state.payments[m.id]||{})[state.currentMonth];const a=state._selectedUserId===m.id?'active':'';return`<div class="user-card-pick ${a}" role="button" tabindex="0" data-action="select-user" data-member-id="${m.id}"><div class="uc-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="uc-name">${sanitize(m.name)}</div><div class="uc-status">${s.paid}/${s.total} paid</div><div class="mt-2">${t?.paid?'<span class="badge badge-green">✓ This month</span>':'<span class="badge badge-red">Due now</span>'}</div></div>`}).join('');
+  wrap.innerHTML=members.map(m=>{const s=getMemberPaymentStats(m.id);const t=(state.payments[m.id]||{})[state.currentMonth];const a=state._selectedUserId===m.id?'active':'';return`<div class="user-card-pick ${a}" role="button" tabindex="0" data-action="select-user" data-member-id="${m.id}"><div class="uc-avatar" style="background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div><div class="uc-name">${sanitize(m.name)}</div><div class="uc-status">${s.paid}/${s.total} paid</div><div class="mt-2">${t?.paid?'<span class="badge badge-green">Γ£ô This month</span>':'<span class="badge badge-red">Due now</span>'}</div></div>`}).join('');
   if(state._selectedUserId)renderUserDetail(state._selectedUserId);
 }
 function renderUserDetail(id){
@@ -944,20 +799,20 @@ function renderUserDetail(id){
       <div class="pr-sl">${mo}</div>
       <div class="pr-month">${fmtDate(sch?.date||'')}</div>
       <div class="pr-amount">${isFut?'<span style="color:var(--slate)">Locked</span>':fmt(e.amount||SCHEDULE_DATA[mo-1][0])}</div>
-      ${isBorrower&&!isFut?'<div class="pr-note" style="color:var(--gold)">🏆 Borrower</div>':sch?.commission&&!isFut?`<div class="pr-note">Commission: ${fmt(sch.commission)}</div>`:'<div class="pr-note"></div>'}
-      <div class="pr-cumulative">${!isFut&&fc!=null?fmt(fc):'—'}</div>
-      <div class="pr-date">${isFut?'🔒':e.date?fmtDate(e.date):'<span style="color:var(--red)">Not paid</span>'}</div>
-      ${!isFut?`<span class="badge ${e.paid?'badge-green':'badge-red'}">${e.paid?'✓ Paid':'Due'}</span>`:'<span class="badge" style="background:var(--bg);color:var(--slate)">—</span>'}
+      ${isBorrower&&!isFut?'<div class="pr-note" style="color:var(--gold)">≡ƒÅå Borrower</div>':sch?.commission&&!isFut?`<div class="pr-note">Commission: ${fmt(sch.commission)}</div>`:'<div class="pr-note"></div>'}
+      <div class="pr-cumulative">${!isFut&&fc!=null?fmt(fc):'ΓÇö'}</div>
+      <div class="pr-date">${isFut?'≡ƒöÆ':e.date?fmtDate(e.date):'<span style="color:var(--red)">Not paid</span>'}</div>
+      ${!isFut?`<span class="badge ${e.paid?'badge-green':'badge-red'}">${e.paid?'Γ£ô Paid':'Due'}</span>`:'<span class="badge" style="background:var(--bg);color:var(--slate)">ΓÇö</span>'}
     </div>`;
   }).join('');
-  document.getElementById('userDetailSection').innerHTML=`<div class="user-detail-card"><div class="udc-banner"><div class="udc-banner-pattern"></div></div><div class="udc-profile"><div class="udc-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div class="udc-info"><div class="udc-name">${sanitize(m.name)}</div><div class="udc-meta">Slot #${m.slotNo} · ${sanitize(m.phone||'—')} · ${sanitize(m.email||'—')}</div></div></div><div class="udc-stats"><div class="udc-stat"><div class="udc-stat-val" style="color:var(--green)">${s.paid}</div><div class="udc-stat-lbl">Months Paid</div></div><div class="udc-stat"><div class="udc-stat-val" style="color:var(--red)">${s.pending}</div><div class="udc-stat-lbl">Pending</div></div><div class="udc-stat"><div class="udc-stat-val">${fmt(s.paidAmount)}</div><div class="udc-stat-lbl">Total Paid</div></div><div class="udc-stat"><div class="udc-stat-val">${pct}%</div><div class="udc-stat-lbl">Completion</div></div></div>${bm.length?`<div style="padding:16px 24px;background:var(--gold-pale);border-top:1px solid var(--border);border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏆 Chit Borrower — Receives the pot this month</div>${bm.map(b=>`<div style="font-size:13px;color:var(--ink)">Month ${b.month} · <strong>${fmt(b.amount)}</strong> received${b.split?' (split pot)':''} · ${fmtDate(b.date)}</div>`).join('')}</div>`:''}<div class="udc-payments"><div class="udc-payments-title">Payment History</div><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;font-size:11px;color:var(--slate)"><span style="width:30px">Sl</span><span style="width:90px">Date</span><span style="flex:1">Amount</span><span style="width:80px"></span><span style="width:100px;text-align:right">Cumulative</span><span style="width:90px;text-align:right">Paid On</span><span style="width:50px">Status</span></div>${rows}</div></div>`;
+  document.getElementById('userDetailSection').innerHTML=`<div class="user-detail-card"><div class="udc-banner"><div class="udc-banner-pattern"></div></div><div class="udc-profile"><div class="udc-avatar" style="background:${avatarColor(id)}">${sanitize(initials(m.name))}</div><div class="udc-info"><div class="udc-name">${sanitize(m.name)}</div><div class="udc-meta">Slot #${m.slotNo} ┬╖ ${sanitize(m.phone||'ΓÇö')} ┬╖ ${sanitize(m.email||'ΓÇö')}</div></div></div><div class="udc-stats"><div class="udc-stat"><div class="udc-stat-val" style="color:var(--green)">${s.paid}</div><div class="udc-stat-lbl">Months Paid</div></div><div class="udc-stat"><div class="udc-stat-val" style="color:var(--red)">${s.pending}</div><div class="udc-stat-lbl">Pending</div></div><div class="udc-stat"><div class="udc-stat-val">${fmt(s.paidAmount)}</div><div class="udc-stat-lbl">Total Paid</div></div><div class="udc-stat"><div class="udc-stat-val">${pct}%</div><div class="udc-stat-lbl">Completion</div></div></div>${bm.length?`<div style="padding:16px 24px;background:var(--gold-pale);border-top:1px solid var(--border);border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">≡ƒÅå Chit Borrower ΓÇö Receives the pot this month</div>${bm.map(b=>`<div style="font-size:13px;color:var(--ink)">Month ${b.month} ┬╖ <strong>${fmt(b.amount)}</strong> received${b.split?' (split pot)':''} ┬╖ ${fmtDate(b.date)}</div>`).join('')}</div>`:''}<div class="udc-payments"><div class="udc-payments-title">Payment History</div><div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;font-size:11px;color:var(--slate)"><span style="width:30px">Sl</span><span style="width:90px">Date</span><span style="flex:1">Amount</span><span style="width:80px"></span><span style="width:100px;text-align:right">Cumulative</span><span style="width:90px;text-align:right">Paid On</span><span style="width:50px">Status</span></div>${rows}</div></div>`;
 }
 function showToast(msg,type='success'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3200)}
 
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // PAGE SWITCHING
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function showPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach((t,i)=>{
@@ -973,9 +828,9 @@ function showPage(page){
 function openModal(id){const el=document.getElementById(id);el.classList.add('open');const f=el.querySelector('input,select,textarea,button:not(.modal-close)');if(f)f.focus()}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // EVENT DELEGATION
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 state._selectedMemberId=null;
 state._selectedUserId=null;
 state._viewMonth=null; // null = all months; number = specific month filter
@@ -1000,8 +855,6 @@ function handleAction(el){
     case 'open-payment': _openPayModal(mid,mo); break;
     case 'open-borrower': _openBorrModal(mo); break;
     case 'bulk-pay': _doBulkPay(mo); break;
-    case 'open-mark-paid': _openMarkPaidModal(mo); break;
-    case 'save-mark-paid': _saveMarkPaid(); break;
     case 'select-user':
       state._selectedUserId=mid;
       renderUserPage(); break;
@@ -1023,14 +876,14 @@ document.getElementById('currentMonthSelect').addEventListener('change',function
   renderAdmin();
 });
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // MODAL CONTROLLERS
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function _openPayModal(mid,mo){
   _payCtx={mid,mo};
   const m=state.members.find(x=>x.id===mid);
   const e=(state.payments[mid]||{})[mo]||{};
-  document.getElementById('paymentModalTitle').textContent=`Payment — ${m?.name??''} — Month ${mo}`;
+  document.getElementById('paymentModalTitle').textContent=`Payment ΓÇö ${m?.name??''} ΓÇö Month ${mo}`;
   document.getElementById('payDate').value=e.date||todayISO();
   document.getElementById('payAmount').value=e.amount||SCHEDULE_DATA[mo-1][0];
   document.getElementById('payNote').value=e.note||'';
@@ -1053,57 +906,44 @@ function _savePayment(){
 }
 function _openBorrModal(mo){
   _borrCtx=mo;
-  document.getElementById('borrowerModalTitle').textContent=`Assign Borrower(s) — Month ${mo} (${fmtDate(DATES[mo-1])})`;
+  document.getElementById('borrowerModalTitle').textContent=`Assign Borrower(s) ΓÇö Month ${mo} (${fmtDate(DATES[mo-1])})`;
   const currentIds=getBorrowerIds(mo);
   const sch=state.schedule[mo];
-  const ba=sch.borrowerAmounts||{};
+  // Build checkbox list
   const cbList=document.getElementById('borrowerCheckboxList');
-  cbList.innerHTML=`<div style="display:grid;grid-template-columns:20px 1fr 140px;gap:8px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:4px"><span></span><span>Member</span><span style="text-align:right">Amount Given (₹)</span></div>`+
-    state.members.map(m=>`<div style="display:grid;grid-template-columns:20px 1fr 140px;align-items:center;gap:8px;padding:5px 8px;border-radius:6px">
-      <input type="checkbox" id="bchk_${m.id}" value="${m.id}" ${currentIds.includes(m.id)?'checked':''} onchange="document.getElementById('bamt_${m.id}').disabled=!this.checked;document.getElementById('bamt_${m.id}').style.opacity=this.checked?'1':'0.3';_updateBorrDist(${mo})" style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer">
-      <label for="bchk_${m.id}" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px"><div class="member-avatar" style="width:26px;height:26px;font-size:10px;background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div>${sanitize(m.name)}<span style="font-size:11px;color:var(--slate)">Slot #${m.slotNo}</span></label>
-      <input type="number" id="bamt_${m.id}" value="${ba[m.id]||''}" placeholder="0" min="0" max="99999999" ${currentIds.includes(m.id)?'':'disabled'} oninput="_updateBorrDist(${mo})" style="width:100%;padding:5px 8px;font-size:13px;border:1.5px solid var(--border);border-radius:6px;text-align:right;opacity:${currentIds.includes(m.id)?'1':'0.3'}">
-    </div>`).join('');
-  document.getElementById('selfAmount').value=sch?.selfAmount||0;
+  cbList.innerHTML=state.members.map(m=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--gold-pale)'" onmouseout="this.style.background=''">
+      <input type="checkbox" value="${m.id}" ${currentIds.includes(m.id)?'checked':''} onchange="_updateBorrDist(${mo})" style="width:16px;height:16px;accent-color:var(--gold)">
+      <div class="member-avatar" style="width:28px;height:28px;font-size:11px;background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div>
+      <span style="font-size:13px;font-weight:500">${sanitize(m.name)}</span>
+      <span style="font-size:11px;color:var(--slate);margin-left:auto">Slot #${m.slotNo}</span>
+    </label>`).join('');
+  document.getElementById('borrowerAmount').value=sch?.potAmount||CONFIG.POT_AMOUNT;
   document.getElementById('borrowerCommission').value=sch?.commission||0;
   _updateBorrDist(mo);
   openModal('borrowerModal');
 }
 
 function _updateBorrDist(mo){
+  const checked=[...document.querySelectorAll('#borrowerCheckboxList input:checked')].map(cb=>parseInt(cb.value,10));
+  const pot=parseInt(document.getElementById('borrowerAmount').value,10)||CONFIG.POT_AMOUNT;
   const dist=document.getElementById('borrowerDistribution');
-  const self=parseInt(document.getElementById('selfAmount').value,10)||0;
-  const checked=[...document.querySelectorAll('#borrowerCheckboxList input[type=checkbox]:checked')];
-  let total=self;let lines=[];
-  checked.forEach(cb=>{
-    const id=parseInt(cb.value,10);
-    const amt=parseInt(document.getElementById('bamt_'+id)?.value,10)||0;
-    const m=state.members.find(x=>x.id===id);
-    if(amt>0){lines.push(`<span style="color:var(--green);font-weight:600">${sanitize(m?.name||'?')}</span> → ${fmt(amt)}`);total+=amt;}
-    else{lines.push(`<span style="color:var(--slate)">${sanitize(m?.name||'?')}</span> → <span style="color:var(--red)">enter amount</span>`);}
-  });
-  if(self>0)lines.push(`<span style="color:var(--gold)"> Self</span>  ${fmt(self)}`);
-  dist.innerHTML=lines.length
-    ?lines.join(' &nbsp;|&nbsp; ')+`<div style="margin-top:8px;font-weight:700;color:var(--ink);font-size:14px">Total out: ${fmt(total)}</div>`
-    :'<span style="color:var(--slate)">Select members and enter amounts above</span>';
+  if(!checked.length){dist.textContent='No borrowers selected';return}
+  const share=Math.round(pot/checked.length);
+  const names=checked.map(id=>{const m=state.members.find(x=>x.id===id);return m?m.name:'?'});
+  dist.innerHTML=checked.length===1
+    ?`<span style="color:var(--green);font-weight:600">${names[0]}</span> receives full pot: <strong>${fmt(pot)}</strong>`
+    :`${checked.length} borrowers ΓÇö each receives <strong>${fmt(share)}</strong><br><span style="color:var(--slate)">${names.join(', ')}</span>`;
 }
 
 function _saveBorrower(){
   const mo=_borrCtx;
-  const checked=[...document.querySelectorAll('#borrowerCheckboxList input[type=checkbox]:checked')];
-  const memberIds=checked.map(cb=>parseInt(cb.value,10));
-  const borrowerAmounts={};
-  let totalPot=0;
-  memberIds.forEach(id=>{
-    const amt=parseInt(document.getElementById('bamt_'+id)?.value,10)||0;
-    borrowerAmounts[id]=amt;
-    totalPot+=amt;
-  });
-  const self=parseInt(document.getElementById('selfAmount').value,10)||0;
-  const com=parseInt(document.getElementById('borrowerCommission').value,10)||0;
-  assignBorrower(mo,{memberIds,potAmount:totalPot,commission:com,selfAmount:self,borrowerAmounts});
+  const memberIds=[...document.querySelectorAll('#borrowerCheckboxList input:checked')].map(cb=>parseInt(cb.value,10));
+  const pot=parseInt(document.getElementById('borrowerAmount').value,10);
+  const com=parseInt(document.getElementById('borrowerCommission').value,10);
+  assignBorrower(mo,{memberIds,potAmount:pot,commission:com});
   closeModal('borrowerModal');
-  showToast(memberIds.length?`${memberIds.length} borrower(s) assigned for Month ${mo}`:'Month '+mo+' updated');
+  showToast(memberIds.length?`${memberIds.length} borrower(s) assigned for Month ${mo}`:'Borrowers cleared');
   renderAdmin();
   _borrCtx=null;
 }
@@ -1113,45 +953,6 @@ function _doBulkPay(mo){
   showToast(`All members marked paid for Month ${mo}`);
   renderAdmin();
   if(state._selectedMemberId)renderPaymentGrid(state._selectedMemberId);
-}
-
-let _markPaidCtx=null;
-function _openMarkPaidModal(mo){
-  _markPaidCtx=mo;
-  document.getElementById('markPaidTitle').textContent=`Mark Members Paid — Month ${mo} (${fmtDate(DATES[mo-1])})`;
-  document.getElementById('markPaidDate').value=todayISO();
-  const list=document.getElementById('markPaidList');
-  list.innerHTML=state.members.map(m=>{
-    const e=(state.payments[m.id]||{})[mo];
-    const isPaid=e?.paid||false;
-    return`<div style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:6px;${isPaid?'opacity:.45':''}">
-      <input type="checkbox" id="mpchk_${m.id}" value="${m.id}" ${isPaid?'disabled':'checked'}
-        style="width:16px;height:16px;accent-color:var(--gold)">
-      <div class="member-avatar" style="width:26px;height:26px;font-size:10px;background:${avatarColor(m.id)}">${sanitize(initials(m.name))}</div>
-      <label for="mpchk_${m.id}" style="flex:1;font-size:13px;cursor:pointer">${sanitize(m.name)}</label>
-      <span class="badge ${isPaid?'badge-green':'badge-red'}">${isPaid?'✓ Paid':'Due'}</span>
-      ${isPaid?`<span style="font-size:11px;color:var(--slate)">${fmtDate(e.date)}</span>`:''}
-    </div>`;
-  }).join('');
-  openModal('markPaidModal');
-}
-
-function _saveMarkPaid(){
-  if(!_markPaidCtx)return;
-  const mo=_markPaidCtx;
-  const date=document.getElementById('markPaidDate').value||todayISO();
-  const selected=[...document.querySelectorAll('#markPaidList input[type=checkbox]:checked:not(:disabled)')].map(c=>parseInt(c.value,10));
-  if(!selected.length){showToast('No members selected','error');return}
-  selected.forEach(mid=>{
-    if(!state.payments[mid])state.payments[mid]={};
-    state.payments[mid][mo]={paid:true,amount:SCHEDULE_DATA[mo-1][0],date,note:''};
-  });
-  saveData();
-  closeModal('markPaidModal');
-  showToast(`${selected.length} member(s) marked paid for Month ${mo}`);
-  renderAdmin();
-  if(state._selectedMemberId)renderPaymentGrid(state._selectedMemberId);
-  _markPaidCtx=null;
 }
 function _saveMember(){
   const name=document.getElementById('mName').value.trim();
@@ -1179,15 +980,15 @@ function _doDeleteMember(id){
   deleteMember(id);
   if(state._selectedMemberId===id){
     state._selectedMemberId=null;
-    document.getElementById('memberDetailCard').innerHTML='<div class="empty-state"><div class="es-icon">👆</div><div class="es-title">Select a member</div></div>';
+    document.getElementById('memberDetailCard').innerHTML='<div class="empty-state"><div class="es-icon">≡ƒæå</div><div class="es-title">Select a member</div></div>';
   }
   showToast(`${m.name} removed`);
   renderAdmin();
 }
 
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 // EXPORT CSV
-// ═══════════════════════════════════════════════
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 function _exportCSV(){
   const{MONTH_COUNT}=CONFIG;
   const h=['Member','Phone','Slot',...Array.from({length:MONTH_COUNT},(_,i)=>`Month ${i+1}`),'Total Paid','Total Pending'];
@@ -1212,51 +1013,60 @@ function _exportCSV(){
   showToast('CSV exported');
 }
 
-// ═══════════════════════════════════════════════
-// INIT — load from Supabase then start app
-// ═══════════════════════════════════════════════
-async function initApp(){
-  // Show loading overlay on top of login screen (don't replace it)
-  const overlay=document.createElement('div');
-  overlay.id='loadingOverlay';
-  overlay.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#1A1A2E,#2D2D4A);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:2000';
-  overlay.innerHTML=`
-    <div style="width:48px;height:48px;border:4px solid rgba(201,168,76,.3);border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div>
-    <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#fff;letter-spacing:.5px">Loading ChitTrack…</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.5)">Connecting to database</div>
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
-  document.body.appendChild(overlay);
-
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// INIT ΓÇö show login screen, build member picker
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// SUPABASE
+const SB_URL='https://tzfhufdhhmdotwwqyyav.supabase.co';
+const SB_KEY='sb_publishable_0dufejTHb5u5-JPV0ERILQ_kh9eg5-6';
+async function _sbFetch(path,opts){
+  opts=opts||{};
+  const h=Object.assign({'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'},opts.headers||{});
+  const r=await fetch(SB_URL+path,Object.assign({},opts,{headers:h}));
+  const t=await r.text();return t?JSON.parse(t):null;
+}
+async function _loadFromSupabase(){
   try{
-    const saved=await _loadFromSupabase();
-    if(saved){
-      Object.assign(state,saved);
-      state._selectedMemberId=null;
-      state._selectedUserId=null;
-      state._viewMonth=null;
+    const rows=await _sbFetch('/rest/v1/chittrack_data?id=eq.main&select=data');
+    if(!rows||!rows[0]||!rows[0].data)return null;
+    const d=rows[0].data;
+    if(!d||typeof d!=='object'||!Array.isArray(d.members))return null;
+    for(let i=1;i<=CONFIG.MONTH_COUNT;i++){
+      if(d.schedule&&d.schedule[i]){
+        const[amt,cum]=SCHEDULE_DATA[i-1];
+        d.schedule[i].date=DATES[i-1]||'';d.schedule[i].depositAmount=amt;d.schedule[i].cumulative=cum;
+        d.schedule[i].commission=i===2?CONFIG.COMMISSION:0;
+        if(!Array.isArray(d.schedule[i].borrowerMemberIds)){const bid=d.schedule[i].borrowerMemberId;d.schedule[i].borrowerMemberIds=bid?[bid]:[];}
+        if(!d.schedule[i].borrowerAmounts)d.schedule[i].borrowerAmounts={};
+        if(d.schedule[i].selfAmount===undefined)d.schedule[i].selfAmount=0;
+      }
     }
-  }catch(e){
-    console.warn('Supabase load error, using defaults',e);
-  }
-
-  // Remove overlay — login screen is already in the DOM and ready
-  overlay.remove();
-  buildMemberPicker();
+    d.currentMonth=computeCurrentMonth();return d;
+  }catch(e){console.warn('SB load failed',e);return null;}
 }
-
-function _showLoginScreen(){
-  // Reset login form fields
-  const u=document.getElementById('loginUser');
-  const p=document.getElementById('loginPass');
-  const err=document.getElementById('loginError');
-  if(u)u.value='';
-  if(p)p.value='';
-  if(err)err.classList.remove('show');
-  switchLoginTab('admin');
-  buildMemberPicker();
+let _saveTimer=null;
+function saveData(){
+  try{localStorage.setItem(CONFIG.STORAGE_KEY,JSON.stringify(state));}catch(e){}
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async()=>{
+    try{
+      const s=Object.assign({},state);
+      delete s._selectedMemberId;delete s._selectedUserId;delete s._viewMonth;
+      await _sbFetch('/rest/v1/chittrack_data?id=eq.main',{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({data:s,updated_at:new Date().toISOString()})});
+    }catch(e){console.warn('SB save failed',e);}
+  },800);
 }
-
-initApp();
+// INIT
+buildMemberPicker();
+(async function(){
+  const ls=document.getElementById('loginScreen');
+  const orig=ls.innerHTML;
+  ls.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:#fff"><div style="width:44px;height:44px;border:4px solid rgba(201,168,76,.3);border-top-color:#C9A84C;border-radius:50%;animation:spin 1s linear infinite"></div><div style="font-family:serif;font-size:20px">Loading...</div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+  const saved=await _loadFromSupabase();
+  ls.innerHTML=orig;
+  if(saved){Object.assign(state,saved);state._selectedMemberId=null;state._selectedUserId=null;state._viewMonth=null;}
+  buildMemberPicker();
+})();
 </script>
 </body>
 </html>
